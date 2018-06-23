@@ -15,4 +15,6 @@ const config = {
     eosPort: 8888,
     eosProtocol: 'http',
   }
-} export default config;
+}
+
+export default config;

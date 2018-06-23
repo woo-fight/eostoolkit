@@ -1,5 +1,5 @@
-import ScatterService from 'scatter-client.js'
-import config from 'config.js'
+import ScatterService from 'scatter-client'
+import config from 'config'
 class Lottery {
   constructor() {
   }
@@ -114,7 +114,14 @@ class Lottery {
     return respone;
   }
 }
-export default Lottery;
+
+let _exports;
+export default (() => {
+  if (!_exports) {
+    _exports = new Lottery();
+  }
+  return _exports;
+})()
 
 // transfertolottery(accoutName, contract, game_index) {
   //   eos.transaction(
