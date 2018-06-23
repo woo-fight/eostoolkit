@@ -4,7 +4,7 @@ class Lottery {
   constructor() {
   }
   async joingame(game_index) {
-    const respone = { data:{}, errmsg: '' };
+    const respone = { data: {}, errmsg: '' };
     const auth = ScatterService.getAuthorization()
     const contract = await ScatterService.getContract();
 
@@ -18,22 +18,22 @@ class Lottery {
         respone.errmsg = errorMsg;
       })
 
-    if (join_game) { respone.data={ transaction_id:join_game.transaction_id} };
+    if (join_game) { respone.data = { transaction_id: join_game.transaction_id } };
 
     return respone;
   }
-async getallgameinfo(){
-  const respone = { data:{}, errmsg: '' };
+  async getGameRecord(account) {
+    const respone = { data: {}, errmsg: '' };
     const localNet = await ScatterService.getEos();
     const games_info = await localNet.getTableRows({
       "json": true,
-      "scope": config.contract_account,
+      "scope": account,
       "code": config.contract_account,
       "table": 'lotterygame',
       "limit": 10000
     }).then(res => {
       if (res && res.rows && res.rows.length) {
-        return  res.rows;
+        return res.rows;
       } else {
         return [];
       }
@@ -45,12 +45,39 @@ async getallgameinfo(){
     if (games_info) {
       respone.data = games_info;
     }
-    else{
+    else {
       respone.errmsg = 'Error while getting games info';
     }
-}
+  }
+  async getBettinsRecord(account) {
+    const respone = { data: {}, errmsg: '' };
+    const localNet = await ScatterService.getEos();
+    const bettings_info = await localNet.getTableRows({
+      "json": true,
+      "scope": account,
+      "code": config.contract_account,
+      "table": 'betting',
+      "limit": 10000
+    }).then(res => {
+      if (res && res.rows && res.rows.length) {
+        return res.rows;
+      } else {
+        return [];
+      }
+    }).catch(e => {
+      console.log(e);
+      return null;
+    })
+
+    if (bettings_info) {
+      respone.data = bettings_info;
+    }
+    else {
+      respone.errmsg = 'Error while getting games info';
+    }
+  }
   async transfer2lottery(betAmount) {
-    const respone = { data:{}, errmsg: '' };
+    const respone = { data: {}, errmsg: '' };
     const auth = ScatterService.getAuthorization()
 
     console.log("bet " + betAmount)
@@ -83,7 +110,7 @@ async getallgameinfo(){
         respone.errmsg = errorMsg;
       })
 
-    if (transfer) (respone.data={transaction_id :transfer.transaction_id});
+    if (transfer) (respone.data = { transaction_id: transfer.transaction_id });
     return respone;
   }
 }
