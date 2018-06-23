@@ -3,7 +3,7 @@ import config from 'config'
 class Lottery {
   constructor() {
   }
-  async joingame(game_index) {
+  async joinGame(game_index) {
     const respone = { data: {}, errmsg: '' };
     const auth = ScatterService.getAuthorization()
     const contract = await ScatterService.getContract();
@@ -24,10 +24,10 @@ class Lottery {
   }
   async getGameRecord(account) {
     const respone = { data: {}, errmsg: '' };
-    const localNet = await ScatterService.getEos();
+    const localNet = ScatterService.getEos();
     const games_info = await localNet.getTableRows({
       "json": true,
-      "scope": account,
+      "scope": config.contract_account,
       "code": config.contract_account,
       "table": 'lotterygame',
       "limit": 10000
@@ -48,10 +48,11 @@ class Lottery {
     else {
       respone.errmsg = 'Error while getting games info';
     }
+    return respone;
   }
   async getBettinsRecord(account) {
     const respone = { data: {}, errmsg: '' };
-    const localNet = await ScatterService.getEos();
+    const localNet = ScatterService.getEos();
     const bettings_info = await localNet.getTableRows({
       "json": true,
       "scope": account,
@@ -75,6 +76,8 @@ class Lottery {
     else {
       respone.errmsg = 'Error while getting games info';
     }
+
+    return respone;
   }
   async transfer2lottery(betAmount) {
     const respone = { data: {}, errmsg: '' };
@@ -94,7 +97,7 @@ class Lottery {
     //   authorization: auth.permission.authorization
     // }
 
-    const contract = await getEos().contract('eosio.token')
+    const contract = getEos().contract('eosio.token')
       .catch(e => {
         console.error('fail to initialize eosio.token ', e)
         app.ports.depositFailed.send('Fail to Initialize eosio.token')
