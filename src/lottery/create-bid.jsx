@@ -1,6 +1,6 @@
 import React from 'react'
 import update from 'react-addons-update';
-import { Grid, Row, Col, Panel, Form, FormGroup, FormControl, ControlLabel, HelpBlock,ListGroup,ListGroupItem, Button, ProgressBar, Alert, Table, Popover, OverlayTrigger } from 'react-bootstrap';
+import { Grid, Row, Col, Panel, Label, Form, FormGroup, FormControl, ControlLabel, HelpBlock,ListGroup,ListGroupItem, Button, ProgressBar, Alert, Table, Popover, OverlayTrigger } from 'react-bootstrap';
 import { EosClient, bindNameToState } from '../scatter-client.jsx';
 import NumericInput from 'react-numeric-input';
 import Lottery from '../services/lottery.js'
@@ -27,6 +27,7 @@ export default class CreateBid extends React.Component {
       name: '',
       bid: 0.1,
       transaction_id: '',
+      betperson: '',
       period:'',
       eos: null
     };
@@ -38,12 +39,19 @@ export default class CreateBid extends React.Component {
         bindNameToState(this.setState.bind(this), ['bidder']);
       }, 1000);
 
+      /* 投注期数 */
       let response = {};
       response = Lottery.getGameRecord(this.state.bidder);
       console.log (response);    
       console.log (response.data)
 
       this.setState({ period: 6 });
+
+      /* 投注人数 */
+      setInterval(() => {
+        this.setState({ betperson: 6 });
+      }, 1000);
+
     });
   }
 
@@ -86,29 +94,6 @@ export default class CreateBid extends React.Component {
     }
 
     console.log('joinGame respone', response);
-
-    /*
-    this.state.eos.transaction(tr => {
-      tr.bidname({
-        bidder: this.state.bidder,
-        newname: this.state.name,
-        bid: this.state.bid + ' EOS',
-      })
-    }).then((data) => {
-      console.log(data);
-      this.setState({loading:false, error:false});
-    }).catch((e) => {
-      let error = JSON.stringify(e);
-      this.setState({loading:false, error:true});
-
-      if(error.includes('must increase bid by 10%')) {
-        this.setState({reason:'Increase bid by 10%'});
-      } else if(error.includes('Missing required accounts')) {
-        this.setState({reason:'Incorrect scatter account - please review chain id, network, and account name.'});
-      }
-    });
-    */
-    
   }
 
   render() {
@@ -143,11 +128,12 @@ export default class CreateBid extends React.Component {
 
     return (
       <div>
+        <h3>
+        <Label bsStyle="success">第{this.state.period}期</Label>
+        </h3>
+        <br/>
+        <h5>投注进度</h5><ProgressBar active bsStyle="info" now={this.state.betperson*10} label={this.state.betperson} />
         <Form style={{paddingTop: '1em'}}>
-        <FormGroup>
-            <ControlLabel>投注期数</ControlLabel>
-            <FormControl.Static>第{this.state.period}期</FormControl.Static>
-          </FormGroup>
           <FormGroup>
             <ControlLabel>投注账号</ControlLabel>{' '}
             <FormControl
