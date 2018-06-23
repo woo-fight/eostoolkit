@@ -5,14 +5,18 @@ import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { Navbar, Nav, NavItem, Panel, Alert, ButtonGroup, Button } from 'react-bootstrap';
 import { ScatterConnect } from './scatter-client.jsx';
 import { LinkContainer } from 'react-router-bootstrap';
+/*
 import Unlock from './unlock.jsx'
 import Tools from './tools/tools.jsx'
 import Names from './names/names.jsx'
 import Staking from './staking/staking.jsx'
+*/
+import Lottery from './lottery/join.jsx'
+import My from './my/my.jsx'
 import './theme.css';
 
 const Home = () => (
-  <Redirect from="/" to="/tools" />
+  <Redirect from="/" to="/lottery" />
 );
 
 class Toolkit extends React.Component {
@@ -29,42 +33,36 @@ class Toolkit extends React.Component {
        <Navbar inverse fixedTop className="navbar">
         <Navbar.Header>
           <Navbar.Brand>
-            <a href="https://www.genereos.io" target="new">EOS Toolkit by GenerEOS</a>
+            <a href="/" target="_self">EOS夺宝游戏</a>
           </Navbar.Brand>
         </Navbar.Header>
       <Nav>
-        <LinkContainer to="/tools">
+        <LinkContainer to="/lottery">
           <NavItem>
-            Tools
+            首页
           </NavItem>
         </LinkContainer>
-        <LinkContainer to="/staking">
+      </Nav>
+      <Nav>
+        <LinkContainer to="/my">
           <NavItem>
-            Staking Management
-          </NavItem>
-        </LinkContainer>
-        <LinkContainer to="/names">
-          <NavItem>
-            Name Auction
+            我的
           </NavItem>
         </LinkContainer>
       </Nav>
       </Navbar>
 
       <div className="container theme-showcase" role="main">
-        <Alert bsStyle="warning"><Unlock/></Alert>
         <Panel bsStyle="primary">
           <Panel.Heading>
-            <Panel.Title componentClass="h3">Scatter Integration</Panel.Title>
+            <Panel.Title componentClass="h3">Scatter钱包插件</Panel.Title>
           </Panel.Heading>
           <Panel.Body><ScatterConnect/></Panel.Body>
         </Panel>
             <Route exact path="/" component={Home} />
-            <Route path="/tools" component={Tools} />
-            <Route path="/names" component={Names} />
-            <Route path="/staking" component={Staking} />
-
-        <p style={{float: 'right'}}>Copywrite GenerEOS 2018 | <a href="https://www.genereos.io" target="new">Website</a> | <a href="https://github.com/genereos/eostoolkit" target="new">GitHub</a></p>
+            <Route path="/lottery" component={Lottery} />
+            <Route path="/my" component={My} />
+        <p style={{float: 'right'}}>EOS121DAC 2018 </p>
       </div>
       </div>
       </Router>
