@@ -12,14 +12,18 @@ class ScatterService {
     this.network = '';//mainNetwork;
     this.scatter = undefined;
     this.eos = undefined;
+    document.addEventListener('scatterLoaded', scatterExtension => {
+      window.scatter.suggestNetwork(config.customNetwork);
+      this.load(window.scatter, config.customNetwork);
+    })
   }
 
-  async load(scatter) {
+  async load(scatter, network) {
     this.scatter = scatter;
     if (this.identity) {
       this.scatter.useIdentity(this.scatter.identity.hash);
     }
-
+    this.network = network;
     this.eos = this.scatter.eos(this.network, Eos, {
       broadcast: true,
       sign: true,
@@ -36,7 +40,7 @@ class ScatterService {
     return this.scatter.getIdentity(requirements).then(() => {
       console.log('Attach Identity');
       console.log(window.scatter.identity);
-      this.load(this.scatter);
+      this.load(this.scatter, this.network);
     });
   }
 
