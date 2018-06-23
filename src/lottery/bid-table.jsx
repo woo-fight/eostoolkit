@@ -53,23 +53,19 @@ export default class BidTable extends React.Component {
         <ReactTable
           columns={[
             {
-              Header: "开奖期数",
+              Header: "期数",
               id: "newname",
               accessor: "newname"
             },
             {
-              Header: "开奖时间",
-              accessor: "high_bidder"
-            },
-            {
-              Header: "中奖地址",
+              Header: "获奖者",
               accessor: "high_bid",
               Cell: row => (
                 <span>{(row.value/10000)} EOS</span>
               )
             },
             {
-              Header: "中奖号码",
+              Header: "中奖金额",
               accessor: "last_bid_time",
               Cell: row => (
                 <span>{this.formatDate(row.value)}</span>
