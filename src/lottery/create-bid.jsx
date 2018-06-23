@@ -2,6 +2,7 @@ import React from 'react'
 import update from 'react-addons-update';
 import { Grid, Row, Col, Panel, Form, FormGroup, FormControl, ControlLabel, HelpBlock,ListGroup,ListGroupItem, Button, ProgressBar, Alert, Table, Popover, OverlayTrigger } from 'react-bootstrap';
 import { EosClient, bindNameToState } from '../scatter-client.jsx';
+import NumericInput from 'react-numeric-input';
 
 export default class CreateBid extends React.Component {
   constructor(props, context) {
@@ -18,7 +19,7 @@ export default class CreateBid extends React.Component {
       reason: '',
       bidder: '',
       name: '',
-      bid: 0.0001,
+      bid: 0.1,
       eos: null
     };
 
@@ -76,22 +77,10 @@ export default class CreateBid extends React.Component {
     });
   }
 
-
-
   render() {
     const isError = this.state.error;
     const isLoading = this.state.loading;
     const isSuccess = this.state.success;
-
-    const contract = (
-      <Popover id="popover-positioned-right" title="bidname">
-        <strong>Action - {'{ bidname }'}</strong><br/>
-        <strong>Description</strong><br/>
-        The {'{ bidname }'} action places a bid on a premium account name, in the knowledge that the high bid will purchase the name.<br/>
-        <br/>
-        As an authorized party I {'{ signer }'} wish to bid on behalf of {'{ bidder }'} the amount of {'{ bid }'} toward purchase of the account name {'{ newname }'}.
-      </Popover>
-    );
 
     const RenderStatus = () => {
       if(isError) {
@@ -130,23 +119,8 @@ export default class CreateBid extends React.Component {
             />
           </FormGroup>
           <FormGroup>
-            <ControlLabel>我要投注</ControlLabel>{' '}
-            <FormControl
-              type="text"
-              value={this.state.name}
-              placeholder="Account Name"
-              onChange={this.handleName}
-            />
-            </FormGroup>
-
-            <FormGroup>
-              <ControlLabel>Bid Amount (in EOS)</ControlLabel>{' '}
-              <FormControl
-                type="text"
-                value={this.state.bid}
-                placeholder="Account Name"
-                onChange={this.handleBid}
-              />
+              <ControlLabel>投注金额(每注0.1EOS)</ControlLabel>{' '}
+              <NumericInput mobile className="form-control" placeholder="投注数量" min={1} max={100} step={1} />
           </FormGroup>{' '}
           <Button type="submit" onClick={this.createBid.bind(this)}>投注</Button>
         </Form>
