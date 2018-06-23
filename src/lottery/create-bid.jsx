@@ -26,21 +26,24 @@ export default class CreateBid extends React.Component {
       bidder: '',
       name: '',
       bid: 0.1,
+      transaction_id: '',
+      period:'',
       eos: null
     };
 
-    document.addEventListener('scatterLoaded', scatterExtension => {
+   document.addEventListener('scatterLoaded', scatterExtension => {
       console.log('Scatter connected')
 
       setInterval(() => {
         bindNameToState(this.setState.bind(this), ['bidder']);
       }, 1000);
 
-      /*
-      let client = EosClient();
-      this.setState({ eos: client});
+      let response = {};
+      response = Lottery.getGameRecord(this.state.bidder);
+      console.log (response);    
+      console.log (response.data)
 
-      */
+      this.setState({ period: 6 });
     });
   }
 
@@ -67,10 +70,22 @@ export default class CreateBid extends React.Component {
     e.preventDefault();
     this.setState({loading:true, error:false, reason:''}); 
 
-    let respone = {};
-    console.log (Lottery);
-    respone = await Lottery.joinGame(5);
-    console.log('joinGame respone', respone);
+    let response = {};
+    response = await Lottery.joinGame(9);
+    console.log (response);
+
+    if (response.errmsg == ''){
+      this.setState({success: true});
+      this.setState({loading:false, error:false});
+      console.log ('success');
+      this.setState({transaction_id: response.data.transaction_id})
+    } else{
+      this.setState({success: false});
+      this.setState({loading:false, error:true});
+      console.log ('failed');
+    }
+
+    console.log('joinGame respone', response);
 
     /*
     this.state.eos.transaction(tr => {
@@ -100,6 +115,7 @@ export default class CreateBid extends React.Component {
     const isError = this.state.error;
     const isLoading = this.state.loading;
     const isSuccess = this.state.success;
+    const txid = this.state.transaction_id;
 
     const RenderStatus = () => {
       if(isError) {
@@ -117,16 +133,21 @@ export default class CreateBid extends React.Component {
       if(isSuccess !== '') {
         return (
           <Alert bsStyle="success">
-            <strong>投注成功. 交易ID: <a href={"https://eospark.com/MainNet/tx/" + isSuccess} target="new">{isSuccess}</a></strong>
+            <strong>投注成功. 交易ID: <a href={"https://eospark.com/MainNet/tx/" + txid} target="new">{this.state.transaction_id}</a></strong>
           </Alert>
         );
       }
       return('');
     }
 
+
     return (
       <div>
         <Form style={{paddingTop: '1em'}}>
+        <FormGroup>
+            <ControlLabel>投注期数</ControlLabel>
+            <FormControl.Static>第{this.state.period}期</FormControl.Static>
+          </FormGroup>
           <FormGroup>
             <ControlLabel>投注账号</ControlLabel>{' '}
             <FormControl
