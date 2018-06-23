@@ -32,9 +32,6 @@ export default class CreateBid extends React.Component {
     document.addEventListener('scatterLoaded', scatterExtension => {
       console.log('Scatter connected')
 
-      await ScatterService.load(window.scatter)
-      await ScatterService.login(config.contract_account);
-
       setInterval(() => {
         bindNameToState(this.setState.bind(this), ['bidder']);
       }, 1000);
@@ -66,15 +63,16 @@ export default class CreateBid extends React.Component {
     this.setState({ gamebets: n });
   }
 
-  createlottery(e) {
+  async createlottery(e) {
     e.preventDefault();
     this.setState({loading:true, error:false, reason:''}); 
 
     let respone = {};
     console.log (Lottery);
-    respone = Lottery.joinGame(5);
+    respone = await Lottery.joinGame(5);
     console.log('joinGame respone', respone);
 
+    /*
     this.state.eos.transaction(tr => {
       tr.bidname({
         bidder: this.state.bidder,
@@ -94,6 +92,7 @@ export default class CreateBid extends React.Component {
         this.setState({reason:'Incorrect scatter account - please review chain id, network, and account name.'});
       }
     });
+    */
     
   }
 

@@ -3,10 +3,31 @@ import { render } from "react-dom";
 import update from 'react-addons-update';
 import EosClient from '../eos-client.jsx';
 import { Button } from 'react-bootstrap';
+import { Tabs, Tab, ButtonToolbar} from 'react-bootstrap';
+
 
 // Import React Table
 import ReactTable from "react-table";
 import "react-table/react-table.css";
+
+const historyButton = (
+
+  <ButtonToolbar>
+  {/* Provides extra visual weight and identifies the primary action in a set of buttons */}
+  <Button bsStyle="success">Primary</Button>
+
+  {/* Indicates a successful or positive action */}
+  <Button bsStyle="success">Success</Button>
+
+  {/* Contextual button for informational alert messages */}
+  <Button bsStyle="success">Info</Button>
+
+  {/* Indicates caution should be taken with this action */}
+  <Button bsStyle="success">Warning</Button>
+
+  {/* Indicates a dangerous or potentially negative action */}
+  <Button bsStyle="success">Danger</Button>
+</ButtonToolbar>);
 
 export default class BidTable extends React.Component {
   constructor() {
@@ -49,6 +70,8 @@ export default class BidTable extends React.Component {
     const { data, loading } = this.state;
     return (
       <div>
+      <Tabs defaultActiveKey={1} id="uncontrolled-tab-example">
+        <Tab eventKey={1} title="投注榜">
         <Button type="submit" onClick={this.getBids.bind(this)}>刷新</Button>
         <ReactTable
           columns={[
@@ -85,6 +108,12 @@ export default class BidTable extends React.Component {
           ]}
         />
         <br />
+        </Tab>
+        <Tab eventKey={2} title="投注详情">
+          {historyButton}
+        </Tab>
+      </Tabs>
+      
       </div>
     );
   }
