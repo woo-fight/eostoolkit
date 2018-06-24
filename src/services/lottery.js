@@ -4,7 +4,7 @@ class Lottery {
   constructor() {
   }
   async joinGame(game_index) {
-    const respone = { data: {}, errmsg: '' };
+    const response = { data: {}, errmsg: '' };
     const auth = ScatterService.getAuthorization()
     const contract = await ScatterService.getContract();
 
@@ -15,15 +15,15 @@ class Lottery {
         const errorMsg = (e && e.message) ||
           (errorObj && errorObj.error && errorObj.error.details && errorObj.error.details.length && errorObj.error.details[0].message) ||
           'An error happened while creating the monster'
-        respone.errmsg = errorMsg;
+        response.errmsg = errorMsg;
       })
 
-    if (join_game) { respone.data = { transaction_id: join_game.transaction_id } };
+    if (join_game) { response.data = { transaction_id: join_game.transaction_id } };
 
-    return respone;
+    return response;
   }
   async getGameRecord(account) {
-    const respone = { data: {}, errmsg: '' };
+    const response = { data: {}, errmsg: '' };
     const localNet = ScatterService.getEos();
     const games_info = await localNet.getTableRows({
       "json": true,
@@ -43,15 +43,15 @@ class Lottery {
     })
 
     if (games_info) {
-      respone.data = games_info;
+      response.data = games_info;
     }
     else {
-      respone.errmsg = 'Error while getting games info';
+      response.errmsg = 'Error while getting games info';
     }
-    return respone;
+    return response;
   }
-  async getBettinsRecord(account) {
-    const respone = { data: {}, errmsg: '' };
+  async getBettingsRecord(account) {
+    const response = { data: {}, errmsg: '' };
     const localNet = ScatterService.getEos();
     const bettings_info = await localNet.getTableRows({
       "json": true,
@@ -71,16 +71,16 @@ class Lottery {
     })
 
     if (bettings_info) {
-      respone.data = bettings_info;
+      response.data = bettings_info;
     }
     else {
-      respone.errmsg = 'Error while getting games info';
+      response.errmsg = 'Error while getting games info';
     }
 
-    return respone;
+    return response;
   }
   async transfer2lottery(betAmount) {
-    const respone = { data: {}, errmsg: '' };
+    const response = { data: {}, errmsg: '' };
     const auth = ScatterService.getAuthorization()
 
     console.log("bet " + betAmount)
@@ -110,11 +110,11 @@ class Lottery {
         console.error('error on bet transfer ', e)
         const errorMsg = (e && e.message) ||
           'An error happened while making the bet, please try again'
-        respone.errmsg = errorMsg;
+        response.errmsg = errorMsg;
       })
 
-    if (transfer) (respone.data = { transaction_id: transfer.transaction_id });
-    return respone;
+    if (transfer) (response.data = { transaction_id: transfer.transaction_id });
+    return response;
   }
 }
 

@@ -7,6 +7,7 @@ class ScatterService {
     this.scatter = undefined;
     this.eos = undefined;
     document.addEventListener('scatterLoaded', scatterExtension => {
+      console.log('ScatterService init');
       window.scatter.suggestNetwork(config.customNetwork);
       this.load(window.scatter, config.customNetwork);
     })
