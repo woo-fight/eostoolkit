@@ -1,6 +1,6 @@
 import React from 'react'
 import update from 'react-addons-update';
-import { Grid, Row, Col, Panel, Form, FormGroup, FormControl, ControlLabel, HelpBlock,ListGroup,ListGroupItem, Button, ProgressBar, Alert, Table, Popover, OverlayTrigger } from 'react-bootstrap';
+import { Grid, Row, Col, Panel, Label, Form, FormGroup, FormControl, ControlLabel, HelpBlock,ListGroup,ListGroupItem, Button, ProgressBar, Alert, Table, Popover, OverlayTrigger } from 'react-bootstrap';
 import { EosClient, bindNameToState } from '../scatter-client.jsx';
 import NumericInput from 'react-numeric-input';
 import Lottery from '../services/lottery.js'
@@ -26,24 +26,32 @@ export default class CreateBid extends React.Component {
       bidder: '',
       name: '',
       bid: 0.1,
+      transaction_id: '',
+      betperson: '',
+      period:'',
       eos: null
     };
 
-    document.addEventListener('scatterLoaded', scatterExtension => {
+   document.addEventListener('scatterLoaded', scatterExtension => {
       console.log('Scatter connected')
-
-      await ScatterService.load(window.scatter)
-      await ScatterService.login(config.contract_account);
 
       setInterval(() => {
         bindNameToState(this.setState.bind(this), ['bidder']);
       }, 1000);
 
-      /*
-      let client = EosClient();
-      this.setState({ eos: client});
+      /* 投注期数 */
+      let response = {};
+      response = Lottery.getGameRecord(this.state.bidder);
+      console.log (response);    
+      console.log (response.data)
 
-      */
+      this.setState({ period: 6 });
+
+      /* 投注人数 */
+      setInterval(() => {
+        this.setState({ betperson: 6 });
+      }, 1000);
+
     });
   }
 
@@ -66,41 +74,33 @@ export default class CreateBid extends React.Component {
     this.setState({ gamebets: n });
   }
 
-  createlottery(e) {
+  async createlottery(e) {
     e.preventDefault();
     this.setState({loading:true, error:false, reason:''}); 
 
-    let respone = {};
-    console.log (Lottery);
-    respone = Lottery.joinGame(5);
-    console.log('joinGame respone', respone);
+    let response = {};
+    response = await Lottery.joinGame(9);
+    console.log (response);
 
-    this.state.eos.transaction(tr => {
-      tr.bidname({
-        bidder: this.state.bidder,
-        newname: this.state.name,
-        bid: this.state.bid + ' EOS',
-      })
-    }).then((data) => {
-      console.log(data);
+    if (response.errmsg == ''){
+      this.setState({success: true});
       this.setState({loading:false, error:false});
-    }).catch((e) => {
-      let error = JSON.stringify(e);
+      console.log ('success');
+      this.setState({transaction_id: response.data.transaction_id})
+    } else{
+      this.setState({success: false});
       this.setState({loading:false, error:true});
+      console.log ('failed');
+    }
 
-      if(error.includes('must increase bid by 10%')) {
-        this.setState({reason:'Increase bid by 10%'});
-      } else if(error.includes('Missing required accounts')) {
-        this.setState({reason:'Incorrect scatter account - please review chain id, network, and account name.'});
-      }
-    });
-    
+    console.log('joinGame respone', response);
   }
 
   render() {
     const isError = this.state.error;
     const isLoading = this.state.loading;
     const isSuccess = this.state.success;
+    const txid = this.state.transaction_id;
 
     const RenderStatus = () => {
       if(isError) {
@@ -118,15 +118,21 @@ export default class CreateBid extends React.Component {
       if(isSuccess !== '') {
         return (
           <Alert bsStyle="success">
-            <strong>投注成功. 交易ID: <a href={"https://eospark.com/MainNet/tx/" + isSuccess} target="new">{isSuccess}</a></strong>
+            <strong>投注成功. 交易ID: <a href={"https://eospark.com/MainNet/tx/" + txid} target="new">{this.state.transaction_id}</a></strong>
           </Alert>
         );
       }
       return('');
     }
 
+
     return (
       <div>
+        <h3>
+        <Label bsStyle="success">第{this.state.period}期</Label>
+        </h3>
+        <br/>
+        <h5>投注进度</h5><ProgressBar active bsStyle="info" now={this.state.betperson*10} label={this.state.betperson} />
         <Form style={{paddingTop: '1em'}}>
           <FormGroup>
             <ControlLabel>投注账号</ControlLabel>{' '}
