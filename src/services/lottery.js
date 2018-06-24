@@ -1,5 +1,5 @@
 import ScatterService from 'scatter-client'
-import config from 'config'
+import config from './config.js'
 class Lottery {
   constructor() {
   }
@@ -88,7 +88,7 @@ class Lottery {
     const data = {
       from: auth.account.name,
       to: config.contract_account,
-      quantity: betAmount.toFixed(4) + ' ' + TOKEN_SYMBOL,
+      quantity: betAmount.toFixed(4) + ' ' + config.token_symnol,
       memo: 'bet'
     }
 
@@ -97,14 +97,12 @@ class Lottery {
     //   authorization: auth.permission.authorization
     // }
 
-    const contract = getEos().contract('eosio.token')
+    const contract = await ScatterService.getEos().contract('eosio.token')
       .catch(e => {
         console.error('fail to initialize eosio.token ', e)
         app.ports.depositFailed.send('Fail to Initialize eosio.token')
       })
-
     if (!contract) return
-
     const transfer = await contract.transfer(data, auth.permission)
       .catch(e => {
         console.error('error on bet transfer ', e)

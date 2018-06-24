@@ -117,28 +117,39 @@ class lottery : public eosio::contract
 	}
 	void transfer(uint64_t sender, uint64_t receiver)
 	{
-		// print("\n>>> sender >>>", sender, " - name: ", name{sender});
-		// print("\n>>> receiver >>>", receiver, " - name: ", name{receiver});
+		print("\n>>> sender >>>", sender, " - name: ", name{sender});
+		print("\n>>> receiver >>>", receiver, " - name: ", name{receiver});
 
-		// // ??? Don't need to verify because we already did it in EOSIO_ABI_EX ???
-		// // eosio_assert(code == N(eosio.token), "I reject your non-eosio.token deposit");
+		// ??? Don't need to verify because we already did it in EOSIO_ABI_EX ???
+		// eosio_assert(code == N(eosio.token), "I reject your non-eosio.token deposit");
 
-		// auto transfer_data = unpack_action_data<st_transfer>();
-		// if (transfer_data.from == _self || transfer_data.to != _self)
-		// {
-		// 	return;
-		// }
+		auto transfer_data = unpack_action_data<st_transfer>();
+		if (transfer_data.from == _self || transfer_data.to != _self)
+		{
+			return;
+		}
 
-		// print("\n>>> transfer data quantity >>> ", transfer_data.quantity);
+		print("\n>>> transfer data quantity >>> ", transfer_data.quantity);
 
-		// // eosio_assert(transfer_data.quantity.symbol == string_to_symbol(4, "EOS"),
+		// eosio_assert(transfer_data.quantity.symbol == string_to_symbol(4, "EOS"),
 		// eosio_assert(transfer_data.quantity.symbol == CORE_SYMBOL,
 		// 			 "lottery only accepts EOS for deposits");
-		// eosio_assert(transfer_data.quantity.is_valid(), "Invalid token transfer");
-		// eosio_assert(transfer_data.quantity.amount > 0, "Quantity must be positive");
-
-		// print("\n", name{transfer_data.from}, " receive fouds:       ", transfer_data.quantity);
-		// // print("\n", name{transfer_data.from}, " funds available: ", new_balance);
+		eosio_assert(transfer_data.quantity.is_valid(), "Invalid token transfer");
+		eosio_assert(transfer_data.quantity.amount > 0, "Quantity must be positive");
+		if (transfer_data.quantity.symbol == CORE_SYMBOL)
+		{
+			auto curr_game = games.rbegin();
+			uint32_t max = transfer_data.quantity.amount / curr_game->betting_value.amount;
+			print("\n>>> max bet number:>>>", max);
+			print("\n>>> transfer_data.quantity.amount >>>", transfer_data.quantity.amount, " - curr_game->betting_value.amount: ", curr_game->betting_value.amount);
+			print("\n>>> curr game_idx >>>", curr_game->g_id, " - name: ", name{sender});
+			for (uint32_t i = 0; i < max; i++)
+			{
+				innerjoin(sender, *curr_game);
+			}
+		}
+		print("\n", name{transfer_data.from}, " receive fouds:       ", transfer_data.quantity);
+		// print("\n", name{transfer_data.from}, " funds available: ", new_balance);
 	}
 
   private:
@@ -209,6 +220,10 @@ class lottery : public eosio::contract
 	{
 		// eosio_assert(max_palyer < 100 && max_palyer >= 0,
 		//"number of players  beyond the limit(100)");
+		eosio_assert(prize_pool.is_valid(), "Invalid prize_pool");
+		eosio_assert(prize_pool.amount > 0, "prize_pool must be positive");
+		eosio_assert(betting_value.is_valid(), "Invalid betting_value");
+		eosio_assert(betting_value.amount > 0, "betting_value must be positive");
 		eosio::print("innercreate: prize_pool amount:", prize_pool.amount,
 					 " betting_value:", betting_value.amount, " max_palyer:",
 					 (uint64_t)max_palyer, "\n");
@@ -235,7 +250,7 @@ class lottery : public eosio::contract
 		checksum256 lucky_key;
 		sha256((char *)&date, sizeof(time), &lucky_key);
 		eosio::print("lucky_key:");
-		for (int i; i < 32; i++)
+		for (uint32_t i = 0; i < 32; i++)
 		{
 			eosio::print((uint32_t)lucky_key.hash[i]);
 		}

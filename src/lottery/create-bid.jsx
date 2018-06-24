@@ -86,9 +86,9 @@ export default class CreateBid extends React.Component {
 
     let response = {};
     console.log('&&&&&&&&&&&', this.state.period);
-    response = await Lottery.joinGame(this.state.period - 1);
-    console.log(response);
-
+    // response = await Lottery.joinGame(this.state.period - 1);
+    response = await Lottery.transfer2lottery(1);
+    console.log('bet response', response);
     if (response.errmsg == '') {
       this.setState({ success: true });
       this.setState({ loading: false, error: false });
@@ -100,7 +100,6 @@ export default class CreateBid extends React.Component {
       console.log('failed');
     }
     await lotterydata.load(Lottery, this.state.bidder);
-    console.log('joinGame response', response);
   }
 
   render() {
