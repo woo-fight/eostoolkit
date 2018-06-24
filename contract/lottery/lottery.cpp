@@ -117,28 +117,28 @@ class lottery : public eosio::contract
 	}
 	void transfer(uint64_t sender, uint64_t receiver)
 	{
-		print("\n>>> sender >>>", sender, " - name: ", name{sender});
-		print("\n>>> receiver >>>", receiver, " - name: ", name{receiver});
+		// print("\n>>> sender >>>", sender, " - name: ", name{sender});
+		// print("\n>>> receiver >>>", receiver, " - name: ", name{receiver});
 
-		// ??? Don't need to verify because we already did it in EOSIO_ABI_EX ???
-		// eosio_assert(code == N(eosio.token), "I reject your non-eosio.token deposit");
+		// // ??? Don't need to verify because we already did it in EOSIO_ABI_EX ???
+		// // eosio_assert(code == N(eosio.token), "I reject your non-eosio.token deposit");
 
-		auto transfer_data = unpack_action_data<st_transfer>();
-		if (transfer_data.from == _self || transfer_data.to != _self)
-		{
-			return;
-		}
+		// auto transfer_data = unpack_action_data<st_transfer>();
+		// if (transfer_data.from == _self || transfer_data.to != _self)
+		// {
+		// 	return;
+		// }
 
-		print("\n>>> transfer data quantity >>> ", transfer_data.quantity);
+		// print("\n>>> transfer data quantity >>> ", transfer_data.quantity);
 
-		// eosio_assert(transfer_data.quantity.symbol == string_to_symbol(4, "EOS"),
-		eosio_assert(transfer_data.quantity.symbol == CORE_SYMBOL,
-					 "lottery only accepts EOS for deposits");
-		eosio_assert(transfer_data.quantity.is_valid(), "Invalid token transfer");
-		eosio_assert(transfer_data.quantity.amount > 0, "Quantity must be positive");
+		// // eosio_assert(transfer_data.quantity.symbol == string_to_symbol(4, "EOS"),
+		// eosio_assert(transfer_data.quantity.symbol == CORE_SYMBOL,
+		// 			 "lottery only accepts EOS for deposits");
+		// eosio_assert(transfer_data.quantity.is_valid(), "Invalid token transfer");
+		// eosio_assert(transfer_data.quantity.amount > 0, "Quantity must be positive");
 
-		print("\n", name{transfer_data.from}, " receive fouds:       ", transfer_data.quantity);
-		// print("\n", name{transfer_data.from}, " funds available: ", new_balance);
+		// print("\n", name{transfer_data.from}, " receive fouds:       ", transfer_data.quantity);
+		// // print("\n", name{transfer_data.from}, " funds available: ", new_balance);
 	}
 
   private:
