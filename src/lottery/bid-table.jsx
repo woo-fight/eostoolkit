@@ -35,6 +35,7 @@ export default class BidTable extends React.Component {
     super();
     this.state = {
       data: [],
+      list:[],
       loading: false
     };
 
@@ -53,6 +54,11 @@ export default class BidTable extends React.Component {
   getBids() {
 
     this.setState({ loading: true });
+    
+    let list_tmp = lotterydata.gamerecords;
+    list_tmp[list_tmp.length - 1].winner = '正在投注';
+    list_tmp[list_tmp.length - 1].prize_pool = '正在投注';
+    this.setState({list: list_tmp});
 
     if (lotterydata.gamerecords !== null) {
       this.setState({ data: lotterydata.gamerecords, loading: false });
@@ -65,7 +71,7 @@ export default class BidTable extends React.Component {
   }
 
   render() {
-    const { data, loading } = this.state;
+    const { list, loading } = this.state;
     return (
       <div>
         <Tabs defaultActiveKey={1} id="uncontrolled-tab-example">
@@ -94,7 +100,7 @@ export default class BidTable extends React.Component {
                 },
               ]}
               defaultPageSize={20}
-              data={data}
+              data={list}
               className="-striped -highlight"
               loading={loading} // Display the loading overlay when we need it
               filterable
