@@ -31,7 +31,7 @@ export default class CreateBid extends React.Component {
       bid: 0.1,
       transaction_id: '',
       betperson: '',
-      period: '',
+      period: 'N',
       eos: null
     };
 
