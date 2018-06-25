@@ -22,10 +22,10 @@ class lottery : public eosio::contract
 	/** 创建一局游戏,指定本局游戏筹码数量
 	* @abi action
 	*/
-	void creategame(asset prize_pool, asset betting_value, uint16_t max_palyer)
+	void creategame(asset prize_pool, asset betting_value, uint16_t max_player)
 	{
 		require_auth(_self); //必须是我们自己
-		innercreate(prize_pool, betting_value, max_palyer);
+		innercreate(prize_pool, betting_value, max_player);
 	}
 
 	/** 玩家加入游戏
@@ -39,11 +39,11 @@ class lottery : public eosio::contract
 		auto curr_game = games.find(g_id);
 		eosio_assert(curr_game != games.end(), "the game dose not exist");
 
-		eosio_assert(curr_game->current_index < curr_game->max_palyer &&
+		eosio_assert(curr_game->current_index < curr_game->max_player &&
 						 curr_game->current_index >= 0,
 					 "reached the maximum number of player");
 		eosio_assert(curr_game != games.end(), "game dose not exist");
-		eosio_assert(curr_game->current_index < curr_game->max_palyer,
+		eosio_assert(curr_game->current_index < curr_game->max_player,
 					 "reached the maximum number of player");
 		action(permission_level{name, N(active)}, N(eosio.token), N(transfer),
 			   std::make_tuple(name, _self, curr_game->betting_value,
@@ -175,11 +175,11 @@ class lottery : public eosio::contract
 	struct lotterygame : public basegame
 	{
 		uint16_t current_index; //当前参与玩家序号
-		uint16_t max_palyer;	//本局玩家人数
+		uint16_t max_player;	//本局玩家人数
 		asset prize_pool;		//奖金池
 		asset betting_value;	//每个投注金额固定
 		EOSLIB_SERIALIZE(lotterygame, (g_id)(winner)(end)(date)(current_index)(
-										  max_palyer)(prize_pool)(betting_value));
+										  max_player)(prize_pool)(betting_value));
 	};
 
 	typedef eosio::multi_index<N(lotterygame), lotterygame> game_index;
@@ -208,7 +208,7 @@ class lottery : public eosio::contract
 		eosio::print("************* inneropen", "\n");
 		auto itr = games.find(g_id);
 		eosio_assert(itr != games.end(), "the game dose not exist");
-		eosio_assert(itr->current_index == itr->max_palyer,
+		eosio_assert(itr->current_index == itr->max_player,
 					 "wrong number of players cannot start the game");
 		game_rule(g_id);
 	}
@@ -216,23 +216,23 @@ class lottery : public eosio::contract
 	* @abi action
 	*/
 	void innercreate(const asset &prize_pool, const asset &betting_value,
-					 uint16_t max_palyer)
+					 uint16_t max_player)
 	{
-		// eosio_assert(max_palyer < 100 && max_palyer >= 0,
+		// eosio_assert(max_player < 100 && max_player >= 0,
 		//"number of players  beyond the limit(100)");
 		eosio_assert(prize_pool.is_valid(), "Invalid prize_pool");
 		eosio_assert(prize_pool.amount > 0, "prize_pool must be positive");
 		eosio_assert(betting_value.is_valid(), "Invalid betting_value");
 		eosio_assert(betting_value.amount > 0, "betting_value must be positive");
 		eosio::print("innercreate: prize_pool amount:", prize_pool.amount,
-					 " betting_value:", betting_value.amount, " max_palyer:",
-					 (uint64_t)max_palyer, "\n");
+					 " betting_value:", betting_value.amount, " max_player:",
+					 (uint64_t)max_player, "\n");
 
 		games.emplace(_self, [&](auto &g) {
 			g.g_id = games.available_primary_key();
 			g.current_index = 0;
 			g.prize_pool = prize_pool;
-			g.max_palyer = max_palyer;
+			g.max_player = max_player;
 			g.betting_value = betting_value;
 		});
 	}
@@ -257,7 +257,7 @@ class lottery : public eosio::contract
 		eosio::print("     **********\n");
 		auto lucky_number =
 			(lucky_key.hash[0] + lucky_key.hash[10] + lucky_key.hash[16]) %
-				game->max_palyer +
+				game->max_player +
 			1;
 		eosio::print(char(lucky_key.hash[0]), char(lucky_key.hash[10]),
 					 char(lucky_key.hash[16]), "\n");
@@ -296,7 +296,7 @@ class lottery : public eosio::contract
 
 		// 开始新一轮的游戏
 		// creategame(core_from_string("100.0000"), 100);
-		innercreate(game->prize_pool, game->betting_value, game->max_palyer);
+		innercreate(game->prize_pool, game->betting_value, game->max_player);
 		// creategame(eosio::chain::asset::from_string("100.0000" " "
 		// CORE_SYMBOL_NAME), 100);
 	}
@@ -333,7 +333,7 @@ class lottery : public eosio::contract
 			b.date = date;
 		});
 
-		if (game.current_index == game.max_palyer)
+		if (game.current_index == game.max_player)
 		{
 			eosio::print("ready to open\n");
 			inneropen(game.g_id);
