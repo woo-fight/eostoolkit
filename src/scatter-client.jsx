@@ -2,7 +2,8 @@ import Eos from 'eosjs'
 import React from 'react'
 import update from 'react-addons-update';
 import { Button, Label } from 'react-bootstrap';
-
+import scatter from 'scatter-client';
+import config from 'config';
 
 const network = {
     blockchain:'eos',
@@ -63,22 +64,21 @@ export class ScatterConnect extends React.Component {
   }
 
   connectIdentity() {
-      this.state.scatter.getIdentity({accounts:[{chainId:network.chainId, blockchain:network.blockchain}]}).then(() => {
-          console.log('Attach Identity');
-          console.log(this.state.scatter.identity);
-          this.setState({identity: window.scatter.identity});
-      }).catch(error => {
-          console.error(error);
-      });
+    scatter.login(config.customNetwork).then(async () => {
+      console.log(this.state.scatter.identity);
+      this.setState({ identity: window.scatter.identity });
+    }).catch(error => {
+      console.error(error);
+    });
+
   }
 
   removeIdentity() {
-    this.state.scatter.forgetIdentity().then(() => {
-      console.log('Detach Identity');
+    scatter.logout().then(() => {
       console.log(this.state.scatter.identity);
-      this.setState({identity: window.scatter.identity});
+      this.setState({ identity: window.scatter.identity });
     }).catch((e) => {
-      if(e.code == 423) {
+      if (e.code == 423) {
         console.log('No identity to detach');
       }
     });
@@ -90,9 +90,9 @@ export class ScatterConnect extends React.Component {
         ) : ( <div/>);
 
     const button = this.state.identity ? (
-      <Button type="submit" onClick={this.removeIdentity.bind(this)} bsStyle="warning">Remove Identity</Button>
+      <Button type="submit" onClick={this.removeIdentity.bind(this)} bsStyle="warning">解绑身份</Button>
     )  : (
-      <Button type="submit" onClick={this.connectIdentity.bind(this)} bsStyle="info">Attach Identity</Button>
+      <Button type="submit" onClick={this.connectIdentity.bind(this)} bsStyle="info">绑定身份</Button>
     );
 
     return (
@@ -106,7 +106,7 @@ export class ScatterConnect extends React.Component {
 
   render() {
       if(this.state.scatter === undefined) {
-        return (<h3>Scatter is required to send transactions. <a href="https://scatter-eos.com/" target="new">Install Scatter</a></h3>);
+        return (<h3>请使用Chrome浏览器<a href="https://scatter-eos.com/" target="new">安装Scatter钱包</a>(需要梯子)</h3>);
       } else {
         return ( this.renderScatter() );
       }
