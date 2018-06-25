@@ -78,7 +78,7 @@ export default class BidTable extends React.Component {
     return (
       <div>
         <Tabs defaultActiveKey={1} id="uncontrolled-tab-example">
-          <Tab eventKey={1} title="投注榜">
+          <Tab eventKey={1} title="往期开奖">
             <Button type="submit" onClick={this.getBids.bind(this)}>刷新</Button>
             <ReactTable
               columns={[
@@ -116,7 +116,7 @@ export default class BidTable extends React.Component {
             />
             <br />
           </Tab>
-          <Tab eventKey={2} title="投注详情">
+          <Tab eventKey={2} title="开奖详情">
             {historyButton}
           </Tab>
         </Tabs>

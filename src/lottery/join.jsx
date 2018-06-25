@@ -17,7 +17,12 @@ export default class Names extends React.Component {
           </Panel.Heading>
           <Panel.Body><CreateBid/></Panel.Body>
         </Panel>
-        <BidTable/>
+        <Panel bsStyle="primary">
+          <Panel.Heading>
+            <Panel.Title componentClass="h3">开奖历史</Panel.Title>
+          </Panel.Heading>
+          <Panel.Body><BidTable/></Panel.Body>
+        </Panel>
       </div>
     );
   }
