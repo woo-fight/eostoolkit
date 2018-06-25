@@ -44,8 +44,6 @@ export default class BidTable extends React.Component {
   }
 
   componentDidMount() {
-    console.log('componentDidMount bid-table');
-
     setInterval(() => {
       this.getBids();
     }, 1000);
@@ -55,12 +53,11 @@ export default class BidTable extends React.Component {
 
     this.setState({ loading: true });
     
-    let list_tmp = lotterydata.gamerecords;
-    list_tmp[list_tmp.length - 1].winner = '正在投注';
-    list_tmp[list_tmp.length - 1].prize_pool = '正在投注';
-    this.setState({list: list_tmp});
-
     if (lotterydata.gamerecords !== null) {
+      let list_tmp = lotterydata.gamerecords;
+      list_tmp[list_tmp.length - 1].winner = '正在投注';
+      list_tmp[list_tmp.length - 1].prize_pool = '正在投注';
+      this.setState({list: list_tmp});
       this.setState({ data: lotterydata.gamerecords, loading: false });
     }
   }
