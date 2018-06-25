@@ -44,28 +44,19 @@ export default class BidTable extends React.Component {
 
   componentDidMount() {
     console.log('componentDidMount bid-table');
-    this.getBids();
+
+    setInterval(() => {
+      this.getBids();
+    }, 1000);
   }
 
   getBids() {
 
     this.setState({ loading: true });
-    // var bids = {
-    //   json: true,
-    //   scope: "eosio",
-    //   code: "eosio",
-    //   table: "namebids",
-    //   limit: 10000
-    // }
 
-    // this.eosClient.getTableRows(bids).then((table)=>{
-    //   this.setState({data: table.rows,loading:false});
-    // });
-    // await lotterydata.load(Lottery, this.state.bidder);
     if (lotterydata.gamerecords !== null) {
       this.setState({ data: lotterydata.gamerecords, loading: false });
     }
-    console.log("&&&&&&&&&&&&&&&", lotterydata.gamerecords);
   }
 
   formatDate(date) {

@@ -14,22 +14,16 @@ export default class CreateBid extends React.Component {
     super(props, context);
 
     this.handleBidder = this.handleBidder.bind(this);
-    this.handleGameID = this.handleGameID.bind(this);
     this.handleGameBets = this.handleGameBets.bind(this);
 
 
     this.state = {
-      // gamerecords,
-      // bettingrecords,
       loading: false,
       error: false,
       success: '',
       reason: '',
-      gameid: '',
       gamebets: 1,
       bidder: '',
-      name: '',
-      bid: 0.1,
       transaction_id: '',
       betperson: '',
       period: 'N',
@@ -38,16 +32,12 @@ export default class CreateBid extends React.Component {
     };
 
     document.addEventListener('scatterLoaded', async (scatterExtension) => {
-      console.log('Scatter connected @@@@@@@@@@@@@@')
+      console.log('Scatter connected')
 
       setInterval(() => {
         bindNameToState(this.setState.bind(this), ['bidder']);
       }, 1000);
 
-      // let response = {};
-      // response = await Lottery.getGameRecord(this.state.bidder);
-      // console.log(response);
-      // console.log(response.data)
       await lotterydata.load(Lottery, this.state.bidder);
 
       /* 投注期数 */
@@ -62,14 +52,11 @@ export default class CreateBid extends React.Component {
 
       /* 投注最大人数 */
       this.setState({ max_player: lotterydata.curr_game_info.max_player });
-      console.log (this.state.max_player);
     });
   }
 
   async  componentDidMount() {
     // this.load(window.scatter, config.customNetwork);
-    console.log(window.scatter, '&&&&&&&&&&&&&^^^');
-    console.log('componentDidMount createbid');
     if (window.scatter !== undefined) {
       this.setState({ eos: EosClient() });
       bindNameToState(this.setState.bind(this), ['bidder']);
@@ -78,10 +65,6 @@ export default class CreateBid extends React.Component {
 
   handleBidder(e) {
     this.setState({ bidder: e.target.value });
-  }
-
-  handleGameID(e) {
-    this.setState({ gameid: e.target.value });
   }
 
   handleGameBets(n) {
@@ -93,21 +76,16 @@ export default class CreateBid extends React.Component {
     this.setState({ loading: true, error: false, reason: '' });
 
     let response = {};
-    console.log('&&&&&&&&&&&', this.state.period);
-    console.log(this.state.gamebets);
     
     // response = await Lottery.joinGame(this.state.period - 1);
     response = await Lottery.transfer2lottery(this.state.gamebets);
-    console.log('bet response', response);
     if (response.errmsg == '') {
       this.setState({ success: true });
       this.setState({ loading: false, error: false });
-      console.log('success');
       this.setState({ transaction_id: response.data.transaction_id })
     } else {
       this.setState({ success: false });
       this.setState({ loading: false, error: true });
-      console.log('failed');
     }
     await lotterydata.load(Lottery, this.state.bidder);
   }
@@ -160,7 +138,7 @@ export default class CreateBid extends React.Component {
             />
           </FormGroup>
           <FormGroup>
-            <ControlLabel>投注数量(每注0.1EOS)</ControlLabel>{' '}
+            <ControlLabel>投注数量(每注1EOS)</ControlLabel>{' '}
             <NumericInput
               mobile
               value={this.state.gamebets}
