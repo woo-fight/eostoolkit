@@ -23,3 +23,14 @@ body {
   line-height: 40px;
   font-size:20px;
 }
+.buttons-wrap{
+  width: 100%;
+  overflow-x: scroll;
+}
+.buttons-wrap .btn-toolbar{
+  width: max-content;
+}
+.buttons-wrap .btn{
+  height: 83px;
+  width:139px;
+}

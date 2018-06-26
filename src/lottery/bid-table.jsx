@@ -11,24 +11,24 @@ import lotterydata from './js/lotterydata.js'
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 
+var btns = [];
+
+for (var i = 5 - 1; i > 0; i--){
+  var status = "";
+  if (i == 5 - 1) {
+    status = "(进行中)";
+  }else {
+    status = "(已结束)";
+  }
+  btns.push (<Button bsStyle="success" bsSize="large">第{i}期{status}</Button>)
+}
+
 const historyButton = (
-
+  <div class="buttons-wrap">
   <ButtonToolbar>
-    {/* Provides extra visual weight and identifies the primary action in a set of buttons */}
-    <Button bsStyle="success">Primary</Button>
-
-    {/* Indicates a successful or positive action */}
-    <Button bsStyle="success">Success</Button>
-
-    {/* Contextual button for informational alert messages */}
-    <Button bsStyle="success">Info</Button>
-
-    {/* Indicates caution should be taken with this action */}
-    <Button bsStyle="success">Warning</Button>
-
-    {/* Indicates a dangerous or potentially negative action */}
-    <Button bsStyle="success">Danger</Button>
-  </ButtonToolbar>);
+    {btns}
+  </ButtonToolbar>
+  </div>);
 
 export default class BidTable extends React.Component {
   constructor() {
@@ -84,7 +84,7 @@ export default class BidTable extends React.Component {
                   Header: "获奖者",
                   accessor: "winner",
                   Cell: row => (
-                    <span>{(row.value)} </span>
+                    <span>{(row.value)}</span>
                   )
                 },
                 {
@@ -93,7 +93,7 @@ export default class BidTable extends React.Component {
                   Cell: row => (
                     <span>{(row.value)}</span>
                   )
-                },
+                }
               ]}
               defaultPageSize={20}
               data={list}
