@@ -16,3 +16,10 @@ body {
 .theme-showcase .navbar .container {
   width: auto;
 }
+.progress{
+  height:40px;
+}
+.progress-bar{
+  line-height: 40px;
+  font-size:20px;
+}
