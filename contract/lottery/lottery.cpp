@@ -45,6 +45,7 @@ class lottery : public eosio::contract
 		eosio_assert(curr_game != games.end(), "game dose not exist");
 		eosio_assert(curr_game->current_index < curr_game->max_player,
 					 "reached the maximum number of player");
+		eosio_assert(curr_game->end != true, "the recent game was over");
 		action(permission_level{name, N(active)}, N(eosio.token), N(transfer),
 			   std::make_tuple(name, _self, curr_game->betting_value,
 							   std::string("bet")))
@@ -70,19 +71,26 @@ class lottery : public eosio::contract
 		require_auth(_self);
 		auto itr = games.find(g_id);
 		eosio_assert(itr != games.end(), "the game dose not exist");
-		eosio_assert(itr->end != true, "the game is over");
+		eosio_assert(itr->end != true, "the game was over");
 
 		auto betting_index = bettings.get_index<N(bygid)>();
 		auto game_bettings = betting_index.find(g_id);
 		while (game_bettings != betting_index.end() &&
 			   game_bettings->g_id == g_id)
 		{
+
+			eosio::print("cancel betting: ", game_bettings->b_id,
+						 eosio::name{game_bettings->player_name});
+			//还需要删除用户的数据(未测试)
+			// auto betting_record_index = betting_table_type(_self, {game_bettings->player_name);
+			// betting_record_index.erase(betting_record_index.find(game_bettings->b_id));
+			// ++game_bettings;
 			//返还用户金额
 			action(permission_level{_self, N(active)}, N(eosio.token), N(transfer),
 				   std::make_tuple(_self, game_bettings->player_name,
 								   game_bettings->bet, string("")))
 				.send();
-			++game_bettings;
+			betting_index.erase(game_bettings++);
 		}
 		games.modify(itr, _self, [&](auto &g) { g.end = true; });
 	}
@@ -92,9 +100,10 @@ class lottery : public eosio::contract
 	*/
 	void removebetting(uint64_t g_id, uint64_t b_id)
 	{
+		require_auth(_self);
 		auto itr = games.find(g_id);
 		eosio_assert(itr != games.end(), "the game dose not exist");
-
+		eosio_assert(itr->end != true, "the recent game was over");
 		auto betting_index = bettings.get_index<N(bygid)>();
 		auto game_bettings = betting_index.find(g_id);
 		while (game_bettings != betting_index.end() &&
@@ -105,9 +114,17 @@ class lottery : public eosio::contract
 			{
 				eosio::print("cancel betting: ", b_id,
 							 eosio::name{betting->player_name});
+				action(permission_level{_self, N(active)}, N(eosio.token), N(transfer),
+					   std::make_tuple(_self, betting->player_name,
+									   betting->bet, string("")))
+					.send();
 				bettings.erase(betting);
 				games.modify(itr, _self,
 							 [&](auto &g) { g.current_index = g.current_index - 1; });
+
+				//还需要删除用户的数据(未测试)
+				// auto betting_record_index = betting_table_type(_self, {betting->player_name);
+				// betting_record_index.erase(betting_record_index.find(game_bettings->b_id));
 				break;
 			}
 			eosio::print("currently placed bet:", eosio::name{betting->player_name},
@@ -115,6 +132,9 @@ class lottery : public eosio::contract
 			++game_bettings;
 		}
 	}
+	/**转账
+	* @abi action
+	*/
 	void transfer(uint64_t sender, uint64_t receiver)
 	{
 		print("\n>>> sender >>>", sender, " - name: ", name{sender});
@@ -139,7 +159,8 @@ class lottery : public eosio::contract
 		if (transfer_data.quantity.symbol == CORE_SYMBOL)
 		{
 			auto curr_game = games.rbegin();
-			uint32_t max = transfer_data.quantity.amount / curr_game->betting_value.amount;
+			eosio_assert(curr_game->end != true, "the recent game was over");
+			auto max = transfer_data.quantity / curr_game->betting_value;
 			print("\n>>> max bet number:>>>", max);
 			print("\n>>> transfer_data.quantity.amount >>>", transfer_data.quantity.amount, " - curr_game->betting_value.amount: ", curr_game->betting_value.amount);
 			print("\n>>> curr game_idx >>>", curr_game->g_id, " - name: ", name{sender});
@@ -224,6 +245,9 @@ class lottery : public eosio::contract
 		eosio_assert(prize_pool.amount > 0, "prize_pool must be positive");
 		eosio_assert(betting_value.is_valid(), "Invalid betting_value");
 		eosio_assert(betting_value.amount > 0, "betting_value must be positive");
+		eosio_assert(max_player > 0, "max_player must be positive");
+		eosio_assert(prize_pool.symbol == CORE_SYMBOL, "prize_pool err,  only core token allowed");
+		eosio_assert(betting_value.symbol == CORE_SYMBOL, "betting_value err,  only core token allowed");
 		eosio::print("innercreate: prize_pool amount:", prize_pool.amount,
 					 " betting_value:", betting_value.amount, " max_player:",
 					 (uint64_t)max_player, "\n");
@@ -255,12 +279,12 @@ class lottery : public eosio::contract
 			eosio::print((uint32_t)lucky_key.hash[i]);
 		}
 		eosio::print("     **********\n");
-		auto lucky_number =
-			(lucky_key.hash[0] + lucky_key.hash[10] + lucky_key.hash[16]) %
-				game->max_player +
-			1;
-		eosio::print(char(lucky_key.hash[0]), char(lucky_key.hash[10]),
-					 char(lucky_key.hash[16]), "\n");
+		/* 当前时间戳的 hash 部分 与 该局游戏最后买家的名称哈希 组成开奖种子 */
+		auto last_betting = bettings.rbegin();
+		auto lucky_number = ((lucky_key.hash[0] + lucky_key.hash[10] + lucky_key.hash[16] + last_betting->player_name) % game->max_player) + 1;
+		eosio::print(">>>lucky seed>>>", " - lucky_key.hash[0]: ", (uint32_t)lucky_key.hash[0],
+					 " - lucky_key.hash[10]: ", (uint32_t)lucky_key.hash[10], " - lucky_key.hash[16]: ", (uint32_t)lucky_key.hash[16],
+					 " - last player_name: ", last_betting->player_name, name{last_betting->player_name}, "\n");
 		eosio::print("the lucky number*******:", lucky_number, "\n");
 		account_name winner;
 		while (curr_game_bettings != betting_index.end() &&
@@ -295,7 +319,6 @@ class lottery : public eosio::contract
 		});
 
 		// 开始新一轮的游戏
-		// creategame(core_from_string("100.0000"), 100);
 		innercreate(game->prize_pool, game->betting_value, game->max_player);
 		// creategame(eosio::chain::asset::from_string("100.0000" " "
 		// CORE_SYMBOL_NAME), 100);
@@ -311,19 +334,18 @@ class lottery : public eosio::contract
 		time date = now();
 		//具体玩家为scope建表，这里要关注 ram 的使用情况，应该使用的合约开发者的 ram
 		// 当前玩家投注数据记录
-		auto betting_record_index = betting_table_type(_self, name);
-		// _bettings_append(betting_record_index);
-		betting_record_index.emplace(_self, [&](auto &b) {
-			b.b_id = bettings.available_primary_key();
-			b.g_id = game.g_id;
-			b.player_name = name;
-			b.bet = game.betting_value;
-			b.lucky_number = game.current_index; //暂时定为成玩家加入序号
-			b.date = date;
-		});
+		// 节省 ram 暂时不要
+		// auto betting_record_index = betting_table_type(_self, name);
+		// betting_record_index.emplace(_self, [&](auto &b) {
+		// 	b.b_id = betting_record_index.available_primary_key();
+		// 	b.g_id = game.g_id;
+		// 	b.player_name = name;
+		// 	b.bet = game.betting_value;
+		// 	b.lucky_number = game.current_index; //暂时定为成玩家加入序号
+		// 	b.date = date;
+		// });
 		//当前合约为scope建表
 		//总投注记录+1
-		// _bettings_append(bettings);
 		bettings.emplace(_self, [&](auto &b) {
 			b.b_id = bettings.available_primary_key();
 			b.g_id = game.g_id;
@@ -343,7 +365,7 @@ class lottery : public eosio::contract
 			eosio::print("palyer num not enough\n");
 		}
 	}
-	///检测是否为我们的货币
+	///检测货币格式是否一致
 	void check_my_asset(const asset &quantity, const asset &game_pay)
 	{
 		/*需不需要精度和符号都相等？此处仅仅符号相等 */
