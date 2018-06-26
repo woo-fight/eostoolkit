@@ -27,7 +27,7 @@ class Lottery {
     const localNet = ScatterService.getEos();
     const games_info = await localNet.getTableRows({
       "json": true,
-      "scope": config.contract_account,
+      "scope": account,
       "code": config.contract_account,
       "table": 'lotterygame',
       "limit": 10000
