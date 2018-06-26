@@ -35,6 +35,7 @@ export default class BidTable extends React.Component {
     super();
     this.state = {
       data: [],
+      list:[],
       loading: false
     };
 
@@ -43,29 +44,22 @@ export default class BidTable extends React.Component {
   }
 
   componentDidMount() {
-    console.log('componentDidMount bid-table');
-    this.getBids();
+    setInterval(() => {
+      this.getBids();
+    }, 1000);
   }
 
   getBids() {
 
     this.setState({ loading: true });
-    // var bids = {
-    //   json: true,
-    //   scope: "eosio",
-    //   code: "eosio",
-    //   table: "namebids",
-    //   limit: 10000
-    // }
-
-    // this.eosClient.getTableRows(bids).then((table)=>{
-    //   this.setState({data: table.rows,loading:false});
-    // });
-    // await lotterydata.load(Lottery, this.state.bidder);
+    
     if (lotterydata.gamerecords !== null) {
+      let list_tmp = lotterydata.gamerecords;
+      list_tmp[list_tmp.length - 1].winner = '正在投注';
+      list_tmp[list_tmp.length - 1].prize_pool = '正在投注';
+      this.setState({list: list_tmp});
       this.setState({ data: lotterydata.gamerecords, loading: false });
     }
-    console.log("&&&&&&&&&&&&&&&", lotterydata.gamerecords);
   }
 
   formatDate(date) {
@@ -74,12 +68,11 @@ export default class BidTable extends React.Component {
   }
 
   render() {
-    const { data, loading } = this.state;
+    const { list, loading } = this.state;
     return (
       <div>
         <Tabs defaultActiveKey={1} id="uncontrolled-tab-example">
           <Tab eventKey={1} title="往期开奖">
-            <Button type="submit" onClick={this.getBids.bind(this)}>刷新</Button>
             <ReactTable
               columns={[
                 {
@@ -103,7 +96,7 @@ export default class BidTable extends React.Component {
                 },
               ]}
               defaultPageSize={20}
-              data={data}
+              data={list}
               className="-striped -highlight"
               loading={loading} // Display the loading overlay when we need it
               filterable
@@ -113,6 +106,12 @@ export default class BidTable extends React.Component {
                   desc: true
                 }
               ]}
+              nextText = '下一页'
+              previousText = '上一页'
+              loadingText = '查询中'
+              noDataText = '无开奖记录'
+              pageText = ''
+              rowsText = '行'
             />
             <br />
           </Tab>
