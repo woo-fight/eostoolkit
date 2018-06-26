@@ -4,6 +4,7 @@
 #include <eosiolib/currency.hpp>
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/multi_index.hpp>
+#include <eosiolib/singleton.hpp>
 #include <iostream>
 #include <string>
 #include <time.h>
@@ -26,7 +27,8 @@ class lottery : public eosio::contract
   public:
     using contract::contract;
     lottery(account_name self)
-        : eosio::contract(self), games(_self, _self), bettings(_self, _self) {}
+        : eosio::contract(self), games(_self, _self),
+          bettings(_self, _self), config(_self, _self) {}
 
     void creategame(asset prize_pool, asset betting_value, uint16_t max_player);
     void join(account_name name, uint64_t g_id);
@@ -34,6 +36,8 @@ class lottery : public eosio::contract
     void stopgame(uint64_t g_id);
     void removebetting(uint64_t g_id, uint64_t b_id);
     void transfer(uint64_t sender, uint64_t receiver);
+    void lock();
+    void unlock();
 
   private:
     struct st_transfer
@@ -71,6 +75,7 @@ class lottery : public eosio::contract
     };
 
     typedef eosio::multi_index<N(lotterygame), lotterygame> game_index;
+
     game_index games;
 
     ///@abi table betting i64
@@ -85,16 +90,22 @@ class lottery : public eosio::contract
         auto primary_key() const { return b_id; }
         uint64_t game_id() const { return g_id; }
         // account_name player_name() const { return player_name; }
-        EOSLIB_SERIALIZE(betting,
-                         (b_id)(g_id)(player_name)(bet)(lucky_number)(date));
+        EOSLIB_SERIALIZE(betting, (b_id)(g_id)(player_name)(bet)(lucky_number)(date));
     };
 
-    typedef eosio::multi_index<
-        N(betting), betting,
-        indexed_by<N(bygid), const_mem_fun<betting, uint64_t, &betting::game_id>>>
-        betting_table_type;
+    typedef eosio::multi_index<N(betting), betting, indexed_by<N(bygid), const_mem_fun<betting, uint64_t, &betting::game_id>>> betting_table_type;
+
     betting_table_type bettings;
 
+    /* ****************************************** */
+    /* ------------ Contract Config Data -------- */
+    /* ****************************************** */
+    struct st_config
+    {
+        uint16_t lock = false; // 合约锁
+    };
+    typedef singleton<N(config), st_config> cfg_singleton;
+    cfg_singleton config;
     /* ****************************************** */
     /* ------------ Private Functions ----------- */
     /* ****************************************** */
@@ -103,4 +114,5 @@ class lottery : public eosio::contract
     void game_rule(uint64_t g_id);
     void innerjoin(const account_name &name, const lotterygame &game);
     void check_my_asset(const asset &quantity, const asset &game_pay);
+    st_config _get_config();
 };

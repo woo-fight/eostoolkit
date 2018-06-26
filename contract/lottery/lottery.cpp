@@ -14,6 +14,8 @@ void lottery::creategame(asset prize_pool, asset betting_value, uint16_t max_pla
 void lottery::join(account_name name, uint64_t g_id)
 {
 	require_auth(name);
+	st_config cc = _get_config();
+	eosio_assert(cc.lock != true, "the contract is locked");
 	auto curr_game = games.find(g_id);
 	eosio_assert(curr_game != games.end(), "the game dose not exist");
 
@@ -120,7 +122,8 @@ void lottery::transfer(uint64_t sender, uint64_t receiver)
 
 	// ??? Don't need to verify because we already did it in EOSIO_ABI_EX ???
 	// eosio_assert(code == N(eosio.token), "I reject your non-eosio.token deposit");
-
+	st_config cc = _get_config();
+	eosio_assert(cc.lock != true, "the contract is locked");
 	auto transfer_data = unpack_action_data<st_transfer>();
 	if (transfer_data.from == _self || transfer_data.to != _self)
 	{
@@ -149,6 +152,18 @@ void lottery::transfer(uint64_t sender, uint64_t receiver)
 	}
 	print("\n", name{transfer_data.from}, " receive fouds:       ", transfer_data.quantity);
 	// print("\n", name{transfer_data.from}, " funds available: ", new_balance);
+}
+void lottery::lock()
+{
+	st_config cc = _get_config();
+	cc.lock = true;
+	config.set(cc, _self);
+}
+void lottery::unlock()
+{
+	st_config cc = _get_config();
+	cc.lock = false;
+	config.set(cc, _self);
 }
 
 void lottery::inneropen(uint64_t g_id)
@@ -302,6 +317,22 @@ void lottery::check_my_asset(const asset &quantity, const asset &game_pay)
 	eosio_assert(quantity.symbol == game_pay.symbol, "bad currency type!");
 }
 
+lottery::st_config lottery::_get_config()
+{
+	st_config cc;
+
+	if (config.exists())
+	{
+		cc = config.get();
+	}
+	else
+	{
+		cc = st_config{};
+		config.set(cc, _self);
+	}
+
+	return cc;
+}
 // EOSIO_ABI(lottery, (creategame)(join)(open)(removebetting)(stopgame)(transfer))
 // https://eosio.stackexchange.com/q/421/54
 #define EOSIO_ABI_EX(TYPE, MEMBERS)                                                                                              \
@@ -327,4 +358,4 @@ void lottery::check_my_asset(const asset &quantity, const asset &game_pay)
 		}                                                                                                                        \
 	}
 
-EOSIO_ABI_EX(lottery, (creategame)(join)(open)(removebetting)(stopgame)(transfer))
+EOSIO_ABI_EX(lottery, (creategame)(join)(open)(removebetting)(stopgame)(transfer)(lock)(unlock))
