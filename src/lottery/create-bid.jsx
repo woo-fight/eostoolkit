@@ -38,7 +38,7 @@ export default class CreateBid extends React.Component {
         bindNameToState(this.setState.bind(this), ['bidder']);
       }, 1000);
 
-      await lotterydata.load(Lottery, this.state.bidder);
+      await lotterydata.load(Lottery);
 
       /* 投注期数 */
       setInterval(() => {

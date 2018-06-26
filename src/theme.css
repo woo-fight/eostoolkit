@@ -33,4 +33,5 @@ body {
 .buttons-wrap .btn{
   height: 83px;
   width:139px;
+  font-size:15px;
 }

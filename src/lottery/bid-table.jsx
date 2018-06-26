@@ -11,24 +11,8 @@ import lotterydata from './js/lotterydata.js'
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 
-var btns = [];
 
-for (var i = 5 - 1; i > 0; i--){
-  var status = "";
-  if (i == 5 - 1) {
-    status = "(进行中)";
-  }else {
-    status = "(已结束)";
-  }
-  btns.push (<Button bsStyle="success" bsSize="large">第{i}期{status}</Button>)
-}
 
-const historyButton = (
-  <div class="buttons-wrap">
-  <ButtonToolbar>
-    {btns}
-  </ButtonToolbar>
-  </div>);
 
 export default class BidTable extends React.Component {
   constructor() {
@@ -36,6 +20,8 @@ export default class BidTable extends React.Component {
     this.state = {
       data: [],
       list:[],
+      detail:[],
+      historyButton:'',
       loading: false
     };
 
@@ -47,8 +33,43 @@ export default class BidTable extends React.Component {
     setInterval(() => {
       this.getBids();
     }, 1000);
+
+    setInterval(() => {
+      this.refreshHistory();
+    }, 1000);
   }
 
+  queryrecord(period, e) {
+    e.preventDefault();
+    let response = {};
+    response = lotterydata.getBettingsByperiod (period);
+    this.setState({ detail : response});
+  }
+
+  refreshHistory () {
+    var btns = [];
+    if (lotterydata.gamerecords !== null) {
+      for (var i = lotterydata.gamerecords.length - 1; i > 0; i--){
+        var status = "";
+        if (i == lotterydata.gamerecords.length - 1) {
+          status = "(进行中)";
+        }else {
+          status = "(已结束)";
+        }
+        btns.push (<Button bsStyle="success" bsSize="large" onClick={this.queryrecord.bind(this, i)}>第{i}期{status}</Button>)
+      }
+   
+      const btnlist = (
+        <div class="buttons-wrap">
+        <ButtonToolbar>
+          {btns}
+        </ButtonToolbar>
+        </div>);  
+
+      this.setState({ historyButton: btnlist});
+    }
+
+  }
   getBids() {
 
     this.setState({ loading: true });
@@ -68,7 +89,7 @@ export default class BidTable extends React.Component {
   }
 
   render() {
-    const { list, loading } = this.state;
+    const { list, loading, detail} = this.state;
     return (
       <div>
         <Tabs defaultActiveKey={1} id="uncontrolled-tab-example">
@@ -116,7 +137,41 @@ export default class BidTable extends React.Component {
             <br />
           </Tab>
           <Tab eventKey={2} title="开奖详情">
-            {historyButton}
+            {this.state.historyButton}
+            <ReactTable
+              columns={[
+                {
+                  Header: "投注账号",
+                  id: "player_name",
+                  accessor: "player_name"
+                },
+                {
+                  Header: "投注金额",
+                  accessor: "bet",
+                  Cell: row => (
+                    <span>{(row.value)}</span>
+                  )
+                },
+                {
+                  Header: "投注号码",
+                  accessor: "lucky_number",
+                  Cell: row => (
+                    <span>{(row.value)}</span>
+                  )
+                }
+              ]}
+              defaultPageSize={20}
+              data={detail}
+              className="-striped -highlight"
+              loading={loading} // Display the loading overlay when we need it
+              nextText = '下一页'
+              previousText = '上一页'
+              loadingText = '查询中'
+              noDataText = '无开奖记录'
+              pageText = ''
+              rowsText = '行'
+            />
+            <br />
           </Tab>
         </Tabs>
 
