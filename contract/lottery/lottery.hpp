@@ -28,15 +28,41 @@ class lottery : public eosio::contract
     using contract::contract;
     lottery(account_name self)
         : eosio::contract(self), games(_self, _self),
-          bettings(_self, _self), config(_self, _self) {}
-
+          bettings(_self, _self), contract_cfg(_self, _self) {}
+    /** 创建一局游戏,指定本局游戏筹码数量
+	* @abi action
+	*/
     void creategame(asset prize_pool, asset betting_value, uint16_t max_player);
+    /** 玩家加入游戏
+	* quantity 一次投注多少
+	* id 表示加入哪局游戏
+	* @abi action
+	*/
     void join(account_name name, uint64_t g_id);
+    /** 开奖
+	** @abi action
+	*/
     void open(uint64_t g_id);
+    /**
+	* 游戏一直未满，管理员主动结束，返回资金给竞猜者
+	* @abi action
+	*/
     void stopgame(uint64_t g_id);
+    /**支付失败的情况下从改局游戏中移除,这种情况不会存在
+	* @abi action
+	*/
     void removebetting(uint64_t g_id, uint64_t b_id);
+    /**转账
+	* @abi action
+	*/
     void transfer(uint64_t sender, uint64_t receiver);
+    /**锁定
+	* @abi action
+	*/
     void lock();
+    /**解锁
+	* @abi action
+	*/
     void unlock();
 
   private:
@@ -70,8 +96,7 @@ class lottery : public eosio::contract
         uint16_t max_player;    //本局玩家人数
         asset prize_pool;       //奖金池
         asset betting_value;    //每个投注金额固定
-        EOSLIB_SERIALIZE(lotterygame, (g_id)(winner)(end)(date)(current_index)(
-                                          max_player)(prize_pool)(betting_value));
+        EOSLIB_SERIALIZE(lotterygame, (g_id)(winner)(end)(date)(current_index)(max_player)(prize_pool)(betting_value));
     };
 
     typedef eosio::multi_index<N(lotterygame), lotterygame> game_index;
@@ -100,19 +125,21 @@ class lottery : public eosio::contract
     /* ****************************************** */
     /* ------------ Contract Config Data -------- */
     /* ****************************************** */
+
+    ///@abi table config i64
     struct st_config
     {
-        uint16_t lock = false; // 合约锁
+        uint64_t lock = false; // 合约锁
     };
     typedef singleton<N(config), st_config> cfg_singleton;
-    cfg_singleton config;
+
+    cfg_singleton contract_cfg;
     /* ****************************************** */
     /* ------------ Private Functions ----------- */
     /* ****************************************** */
-    void inneropen(uint64_t g_id);
-    void innercreate(const asset &prize_pool, const asset &betting_value, uint16_t max_player);
-    void game_rule(uint64_t g_id);
-    void innerjoin(const account_name &name, const lotterygame &game);
-    void check_my_asset(const asset &quantity, const asset &game_pay);
+    void _open(uint64_t g_id);
+    void _creategame(const asset &prize_pool, const asset &betting_value, uint16_t max_player);
+    void _game_rule(uint64_t g_id);
+    void _join(const account_name &name, const lotterygame &game);
     st_config _get_config();
 };
