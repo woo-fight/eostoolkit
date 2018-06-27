@@ -38,14 +38,14 @@ class Toolkit extends React.Component {
         </Navbar.Header>
       <Nav>
         <LinkContainer to="/lottery">
-          <NavItem>
+          <NavItem  onClick={ e => this.props.history.push("/lottery") } >
             首页
           </NavItem>
         </LinkContainer>
       </Nav>
       <Nav>
         <LinkContainer to="/my">
-          <NavItem>
+          <NavItem onClick={ e => this.props.history.push("/my")}>
             我的
           </NavItem>
         </LinkContainer>
