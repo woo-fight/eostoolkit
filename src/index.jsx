@@ -43,13 +43,15 @@ class Toolkit extends React.Component {
           </NavItem>
         </LinkContainer>
       </Nav>
+      {/*
       <Nav>
         <LinkContainer to="/my">
-          <NavItem onClick={ e => this.props.history.push("/my")}>
+          <NavItem >
             我的
           </NavItem>
         </LinkContainer>
       </Nav>
+      */}
       </Navbar>
 
       <div className="container theme-showcase" role="main">
