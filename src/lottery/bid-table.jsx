@@ -11,9 +11,7 @@ import lotterydata from './js/lotterydata.js'
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 
-
-
-
+// console.log(document.querySelector(".buttons-wrap"));
 export default class BidTable extends React.Component {
   constructor() {
     super();
@@ -45,18 +43,21 @@ export default class BidTable extends React.Component {
     response = lotterydata.getBettingsByperiod (period);
     this.setState({ detail : response});
   }
-
+ 
   refreshHistory () {
     var btns = [];
     if (lotterydata.gamerecords !== null) {
       for (var i = lotterydata.gamerecords.length - 1; i > 0; i--){
         var status = "";
+        var style ="";
         if (i == lotterydata.gamerecords.length - 1) {
+          style = "success";
           status = "(进行中)";
         }else {
+          style = "primary";
           status = "(已结束)";
         }
-        btns.push (<Button bsStyle="success" bsSize="large" onClick={this.queryrecord.bind(this, i)}>第{i}期{status}</Button>)
+        btns.push (<Button key={i} bsStyle={style}  bsSize="large" onClick={this.queryrecord.bind(this, i)}>第{i}期{status}</Button>)
       }
    
       const btnlist = (

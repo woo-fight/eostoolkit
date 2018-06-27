@@ -77,7 +77,6 @@ export default class CreateBid extends React.Component {
 
     let response = {};
     
-    // response = await Lottery.joinGame(this.state.period - 1);
     response = await Lottery.transfer2lottery(this.state.gamebets);
     if (response.errmsg == '') {
       this.setState({ success: true });
