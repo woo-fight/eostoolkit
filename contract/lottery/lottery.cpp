@@ -3,7 +3,7 @@
 void lottery::creategame(asset prize_pool, asset betting_value, uint16_t max_player)
 {
 	require_auth(_self); //必须是我们自己
-	innercreate(prize_pool, betting_value, max_player);
+	_creategame(prize_pool, betting_value, max_player);
 }
 
 /** 玩家加入游戏
@@ -14,21 +14,19 @@ void lottery::creategame(asset prize_pool, asset betting_value, uint16_t max_pla
 void lottery::join(account_name name, uint64_t g_id)
 {
 	require_auth(name);
+	st_config cc = _get_config();
+	eosio_assert(cc.lock != true, "the contract is locked");
 	auto curr_game = games.find(g_id);
 	eosio_assert(curr_game != games.end(), "the game dose not exist");
-
+	eosio_assert(curr_game->end != true, "the recent game was over");
 	eosio_assert(curr_game->current_index < curr_game->max_player &&
 					 curr_game->current_index >= 0,
 				 "reached the maximum number of player");
-	eosio_assert(curr_game != games.end(), "game dose not exist");
-	eosio_assert(curr_game->current_index < curr_game->max_player,
-				 "reached the maximum number of player");
-	eosio_assert(curr_game->end != true, "the recent game was over");
 	action(permission_level{name, N(active)}, N(eosio.token), N(transfer),
 		   std::make_tuple(name, _self, curr_game->betting_value,
 						   std::string("bet")))
 		.send();
-	innerjoin(name, *curr_game);
+	_join(name, *curr_game);
 }
 
 /** 开奖
@@ -37,7 +35,7 @@ void lottery::join(account_name name, uint64_t g_id)
 void lottery::open(uint64_t g_id)
 {
 	require_auth(_self);
-	inneropen(g_id);
+	_open(g_id);
 }
 
 /**
@@ -120,7 +118,8 @@ void lottery::transfer(uint64_t sender, uint64_t receiver)
 
 	// ??? Don't need to verify because we already did it in EOSIO_ABI_EX ???
 	// eosio_assert(code == N(eosio.token), "I reject your non-eosio.token deposit");
-
+	st_config cc = _get_config();
+	eosio_assert(cc.lock != true, "the contract is locked");
 	auto transfer_data = unpack_action_data<st_transfer>();
 	if (transfer_data.from == _self || transfer_data.to != _self)
 	{
@@ -144,26 +143,40 @@ void lottery::transfer(uint64_t sender, uint64_t receiver)
 		print("\n>>> curr game_idx >>>", curr_game->g_id, " - name: ", name{sender});
 		for (uint32_t i = 0; i < max; i++)
 		{
-			innerjoin(sender, *curr_game);
+			_join(sender, *curr_game);
 		}
 	}
 	print("\n", name{transfer_data.from}, " receive fouds:       ", transfer_data.quantity);
 	// print("\n", name{transfer_data.from}, " funds available: ", new_balance);
 }
-
-void lottery::inneropen(uint64_t g_id)
+void lottery::lock()
 {
-	eosio::print("************* inneropen", "\n");
+	require_auth(_self);
+	st_config cc = _get_config();
+	cc.lock = true;
+	contract_cfg.set(cc, _self);
+}
+void lottery::unlock()
+{
+	require_auth(_self);
+	st_config cc = _get_config();
+	cc.lock = false;
+	contract_cfg.set(cc, _self);
+}
+
+void lottery::_open(uint64_t g_id)
+{
+	eosio::print("************* _open", "\n");
 	auto itr = games.find(g_id);
 	eosio_assert(itr != games.end(), "the game dose not exist");
 	eosio_assert(itr->current_index == itr->max_player,
 				 "wrong number of players cannot start the game");
-	game_rule(g_id);
+	_game_rule(g_id);
 }
 /** 创建一局游戏,指定本局游戏筹码数量
 	* @abi action
 	*/
-void lottery::innercreate(const asset &prize_pool, const asset &betting_value,
+void lottery::_creategame(const asset &prize_pool, const asset &betting_value,
 						  uint16_t max_player)
 {
 	// eosio_assert(max_player < 100 && max_player >= 0,
@@ -175,7 +188,7 @@ void lottery::innercreate(const asset &prize_pool, const asset &betting_value,
 	eosio_assert(max_player > 0, "max_player must be positive");
 	eosio_assert(prize_pool.symbol == CORE_SYMBOL, "prize_pool err,  only core token allowed");
 	eosio_assert(betting_value.symbol == CORE_SYMBOL, "betting_value err,  only core token allowed");
-	eosio::print("innercreate: prize_pool amount:", prize_pool.amount,
+	eosio::print("_creategame: prize_pool amount:", prize_pool.amount,
 				 " betting_value:", betting_value.amount, " max_player:",
 				 (uint64_t)max_player, "\n");
 
@@ -187,13 +200,13 @@ void lottery::innercreate(const asset &prize_pool, const asset &betting_value,
 		g.betting_value = betting_value;
 	});
 }
-void lottery::game_rule(uint64_t g_id)
+void lottery::_game_rule(uint64_t g_id)
 {
 	auto game = games.find(g_id);
 	eosio_assert(game != games.end(), "the game dose not exist");
 	auto betting_index = bettings.get_index<N(bygid)>();
 	auto curr_game_bettings = betting_index.find(g_id);
-	eosio::print("************** game_rule", "\n");
+	eosio::print("************** _game_rule", "\n");
 	// 随机出获奖号码，这里有隐患
 	time date = now();
 	// srand(date);
@@ -246,12 +259,12 @@ void lottery::game_rule(uint64_t g_id)
 	});
 
 	// 开始新一轮的游戏
-	innercreate(game->prize_pool, game->betting_value, game->max_player);
+	_creategame(game->prize_pool, game->betting_value, game->max_player);
 	// creategame(eosio::chain::asset::from_string("100.0000" " "
 	// CORE_SYMBOL_NAME), 100);
 }
 
-void lottery::innerjoin(const account_name &name, const lotterygame &game)
+void lottery::_join(const account_name &name, const lotterygame &game)
 {
 	auto betting_index = bettings.get_index<N(bygid)>();
 	auto curr_game_bettings = betting_index.find(game.g_id);
@@ -286,23 +299,31 @@ void lottery::innerjoin(const account_name &name, const lotterygame &game)
 	if (game.current_index == game.max_player)
 	{
 		eosio::print("ready to open\n");
-		inneropen(game.g_id);
+		_open(game.g_id);
 	}
 	else
 	{
 		eosio::print("palyer num not enough\n");
 	}
 }
-///检测货币格式是否一致
-void lottery::check_my_asset(const asset &quantity, const asset &game_pay)
-{
-	/*需不需要精度和符号都相等？此处仅仅符号相等 */
-	eosio::print("quantity:", quantity.symbol, " game_pay:", game_pay.symbol,
-				 "\n");
-	eosio_assert(quantity.symbol == game_pay.symbol, "bad currency type!");
-}
 
-// EOSIO_ABI(lottery, (creategame)(join)(open)(removebetting)(stopgame)(transfer))
+lottery::st_config lottery::_get_config()
+{
+	st_config cc;
+
+	if (contract_cfg.exists())
+	{
+		cc = contract_cfg.get();
+	}
+	else
+	{
+		cc = st_config{};
+		contract_cfg.set(cc, _self);
+	}
+
+	return cc;
+}
+// EOSIO_ABI(lottery, (creategame)(join)(open)(removebetting)(stopgame)(transfer)(lock)(unlock))
 // https://eosio.stackexchange.com/q/421/54
 #define EOSIO_ABI_EX(TYPE, MEMBERS)                                                                                              \
 	extern "C"                                                                                                                   \
@@ -327,4 +348,4 @@ void lottery::check_my_asset(const asset &quantity, const asset &game_pay)
 		}                                                                                                                        \
 	}
 
-EOSIO_ABI_EX(lottery, (creategame)(join)(open)(removebetting)(stopgame)(transfer))
+EOSIO_ABI_EX(lottery, (creategame)(join)(open)(removebetting)(stopgame)(transfer)(lock)(unlock))
