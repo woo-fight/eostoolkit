@@ -64,6 +64,10 @@ class lottery : public eosio::contract
 	* @abi action
 	*/
     void unlock();
+    /**删除 table 数据
+	* @abi action
+	*/
+    void distorytable();
 
   private:
     struct st_transfer
@@ -83,7 +87,7 @@ class lottery : public eosio::contract
         uint64_t g_id;
         account_name winner;
         uint16_t end = false; //是否已经开奖
-        time date = now();    //开始游戏时间
+        // time date = now();    //开始游戏时间
         auto primary_key() const { return g_id; }
 
         EOSLIB_SERIALIZE(basegame, (g_id)(winner)(end));
@@ -96,7 +100,7 @@ class lottery : public eosio::contract
         uint16_t max_player;    //本局玩家人数
         asset prize_pool;       //奖金池
         asset betting_value;    //每个投注金额固定
-        EOSLIB_SERIALIZE(lotterygame, (g_id)(winner)(end)(date)(current_index)(max_player)(prize_pool)(betting_value));
+        EOSLIB_SERIALIZE(lotterygame, (g_id)(winner)(end)(current_index)(max_player)(prize_pool)(betting_value));
     };
 
     typedef eosio::multi_index<N(lotterygame), lotterygame> game_index;
@@ -111,15 +115,14 @@ class lottery : public eosio::contract
         account_name player_name; //玩家账户
         asset bet;                //投注额度
         uint64_t lucky_number;    //投注号码
-        time date = now();        //投注时间
+        // time date = now();        //投注时间
         auto primary_key() const { return b_id; }
         uint64_t game_id() const { return g_id; }
         // account_name player_name() const { return player_name; }
-        EOSLIB_SERIALIZE(betting, (b_id)(g_id)(player_name)(bet)(lucky_number)(date));
+        EOSLIB_SERIALIZE(betting, (b_id)(g_id)(player_name)(bet)(lucky_number));
     };
 
     typedef eosio::multi_index<N(betting), betting, indexed_by<N(bygid), const_mem_fun<betting, uint64_t, &betting::game_id>>> betting_table_type;
-
     betting_table_type bettings;
 
     /* ****************************************** */

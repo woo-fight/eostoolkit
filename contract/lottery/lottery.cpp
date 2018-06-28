@@ -6,11 +6,6 @@ void lottery::creategame(asset prize_pool, asset betting_value, uint16_t max_pla
 	_creategame(prize_pool, betting_value, max_player);
 }
 
-/** 玩家加入游戏
-	* quantity 一次投注多少
-	* id 表示加入哪局游戏
-	* @abi action
-	*/
 void lottery::join(account_name name, uint64_t g_id)
 {
 	require_auth(name);
@@ -29,19 +24,12 @@ void lottery::join(account_name name, uint64_t g_id)
 	_join(name, *curr_game);
 }
 
-/** 开奖
-	** @abi action
-	*/
 void lottery::open(uint64_t g_id)
 {
 	require_auth(_self);
 	_open(g_id);
 }
 
-/**
-	* 游戏一直未满，管理员主动结束，返回资金给竞猜者
-	* @abi action
-	*/
 void lottery::stopgame(uint64_t g_id)
 {
 	require_auth(_self);
@@ -71,9 +59,6 @@ void lottery::stopgame(uint64_t g_id)
 	games.modify(itr, _self, [&](auto &g) { g.end = true; });
 }
 
-/**支付失败的情况下从改局游戏中移除,这种情况不会存在
-	* @abi action
-	*/
 void lottery::removebetting(uint64_t g_id, uint64_t b_id)
 {
 	require_auth(_self);
@@ -108,9 +93,7 @@ void lottery::removebetting(uint64_t g_id, uint64_t b_id)
 		++game_bettings;
 	}
 }
-/**转账
-	* @abi action
-	*/
+
 void lottery::transfer(uint64_t sender, uint64_t receiver)
 {
 	print("\n>>> sender >>>", sender, " - name: ", name{sender});
@@ -163,7 +146,21 @@ void lottery::unlock()
 	cc.lock = false;
 	contract_cfg.set(cc, _self);
 }
-
+void lottery::distorytable()
+{
+	require_auth(_self);
+	/* 删除 table lottergame */
+	auto itr_game = games.begin();
+	while (itr_game != games.end())
+	{
+		games.erase(itr_game++);
+	}
+	auto itr_betting = bettings.begin();
+	while (itr_betting != bettings.end())
+	{
+		bettings.erase(itr_betting++);
+	}
+}
 void lottery::_open(uint64_t g_id)
 {
 	eosio::print("************* _open", "\n");
@@ -272,7 +269,7 @@ void lottery::_join(const account_name &name, const lotterygame &game)
 	games.modify(game, _self,
 				 [&](auto &g) { g.current_index = g.current_index + 1; });
 
-	time date = now();
+	// time date = now();
 	//具体玩家为scope建表，这里要关注 ram 的使用情况，应该使用的合约开发者的 ram
 	// 当前玩家投注数据记录
 	// 节省 ram 暂时不要
@@ -293,7 +290,7 @@ void lottery::_join(const account_name &name, const lotterygame &game)
 		b.player_name = name;
 		b.bet = game.betting_value;
 		b.lucky_number = game.current_index; //暂时定为成玩家加入序号
-		b.date = date;
+											 // b.date = date;
 	});
 
 	if (game.current_index == game.max_player)
@@ -348,4 +345,4 @@ lottery::st_config lottery::_get_config()
 		}                                                                                                                        \
 	}
 
-EOSIO_ABI_EX(lottery, (creategame)(join)(open)(removebetting)(stopgame)(transfer)(lock)(unlock))
+EOSIO_ABI_EX(lottery, (creategame)(join)(open)(removebetting)(stopgame)(transfer)(lock)(unlock)(distorytable))
