@@ -54,7 +54,7 @@ export default class BidTable extends React.Component {
           style = "success";
           status = "(进行中)";
         }else {
-          style = "primary";
+          style = "info";
           status = "(已结束)";
         }
         btns.push (<Button key={i} bsStyle={style}  bsSize="large" onClick={this.queryrecord.bind(this, i)}>第{i}期{status}</Button>)
@@ -94,8 +94,9 @@ export default class BidTable extends React.Component {
     const { list, loading, detail} = this.state;
     return (
       <div>
-        <Tabs defaultActiveKey={1} id="uncontrolled-tab-example">
+        <Tabs bsStyle="pills"  animation={true} defaultActiveKey={1} id="uncontrolled-tab-example">
           <Tab eventKey={1} title="往期开奖">
+          <br/>
             <ReactTable
               columns={[
                 {
@@ -138,8 +139,10 @@ export default class BidTable extends React.Component {
             />
             <br />
           </Tab>
-          <Tab eventKey={2} title="开奖详情">
+          <Tab eventKey={2}  title="开奖详情">
+          <br/>
             {this.state.historyButton}
+          <br/>
             <ReactTable
               columns={[
                 {
