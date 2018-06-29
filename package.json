@@ -10,7 +10,8 @@
   "scripts": {
     "start": "webpack-dev-server --history-api-fallback --config webpack.config.js --mode development",
     "test": "echo \"No test specified\" && exit 0",
-    "compile": "webpack --config ./webpack.config.js --progress"
+    "compile": "webpack --config webpack.config.js --progress",
+    "build": "webpack --config webpack.config.js"
   },
   "keywords": [
     "react",
