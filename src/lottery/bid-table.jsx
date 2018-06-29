@@ -61,7 +61,7 @@ export default class BidTable extends React.Component {
       }
    
       const btnlist = (
-        <div class="buttons-wrap">
+        <div className="buttons-wrap">
         <ButtonToolbar>
           {btns}
         </ButtonToolbar>
@@ -75,7 +75,8 @@ export default class BidTable extends React.Component {
 
     this.setState({ loading: true });
     
-    if (lotterydata.gamerecords !== null) {
+    if (lotterydata.gamerecords !== null && JSON.stringify(lotterydata.gamerecords) != '{}') {
+
       let list_tmp = lotterydata.gamerecords;
       list_tmp[list_tmp.length - 1].winner = '正在投注';
       list_tmp[list_tmp.length - 1].prize_pool = '正在投注';
@@ -161,7 +162,8 @@ export default class BidTable extends React.Component {
                   )
                 }
               ]}
-              defaultPageSize={20}
+              pageSizeOptions = {[50,101]}
+              defaultPageSize={101}
               data={detail}
               className="-striped -highlight"
               loading={loading} // Display the loading overlay when we need it
