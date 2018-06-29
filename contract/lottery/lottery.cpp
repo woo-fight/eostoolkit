@@ -112,11 +112,11 @@ void lottery::transfer(uint64_t sender, uint64_t receiver)
 	print("\n>>> transfer data quantity >>> ", transfer_data.quantity);
 
 	// eosio_assert(transfer_data.quantity.symbol == string_to_symbol(4, "EOS"),
-	// eosio_assert(transfer_data.quantity.symbol == CORE_SYMBOL,
+	// eosio_assert(transfer_data.quantity.symbol == string_to_symbol(4, "EOS"),
 	// 			 "lottery only accepts EOS for deposits");
 	eosio_assert(transfer_data.quantity.is_valid(), "Invalid token transfer");
 	eosio_assert(transfer_data.quantity.amount > 0, "Quantity must be positive");
-	if (transfer_data.quantity.symbol == CORE_SYMBOL)
+	if (transfer_data.quantity.symbol == string_to_symbol(4, "EOS"))
 	{
 		auto curr_game = games.rbegin();
 		eosio_assert(curr_game->end != true, "the recent game was over");
@@ -183,8 +183,8 @@ void lottery::_creategame(const asset &prize_pool, const asset &betting_value,
 	eosio_assert(betting_value.is_valid(), "Invalid betting_value");
 	eosio_assert(betting_value.amount > 0, "betting_value must be positive");
 	eosio_assert(max_player > 0, "max_player must be positive");
-	eosio_assert(prize_pool.symbol == CORE_SYMBOL, "prize_pool err,  only core token allowed");
-	eosio_assert(betting_value.symbol == CORE_SYMBOL, "betting_value err,  only core token allowed");
+	eosio_assert(prize_pool.symbol == string_to_symbol(4, "EOS"), "prize_pool err,  only core token allowed");
+	eosio_assert(betting_value.symbol == string_to_symbol(4, "EOS"), "betting_value err,  only core token allowed");
 	eosio::print("_creategame: prize_pool amount:", prize_pool.amount,
 				 " betting_value:", betting_value.amount, " max_player:",
 				 (uint64_t)max_player, "\n");
@@ -218,18 +218,18 @@ void lottery::_game_rule(uint64_t g_id)
 	eosio::print("     **********\n");
 	/* 当前时间戳的 hash 部分 与 该局游戏最后买家的名称哈希 组成开奖种子 */
 	auto last_betting = bettings.rbegin();
-	auto lucky_number = ((lucky_key.hash[0] + lucky_key.hash[10] + lucky_key.hash[16] + last_betting->player_name) % game->max_player) + 1;
+	auto prize_number = ((lucky_key.hash[0] + lucky_key.hash[10] + lucky_key.hash[16] + last_betting->player_name) % game->max_player) + 1;
 	eosio::print(">>>lucky seed>>>", " - lucky_key.hash[0]: ", (uint32_t)lucky_key.hash[0],
 				 " - lucky_key.hash[10]: ", (uint32_t)lucky_key.hash[10], " - lucky_key.hash[16]: ", (uint32_t)lucky_key.hash[16],
 				 " - last player_name: ", last_betting->player_name, name{last_betting->player_name}, "\n");
-	eosio::print("the lucky number*******:", lucky_number, "\n");
+	eosio::print("the lucky number*******:", prize_number, "\n");
 	account_name winner;
 	while (curr_game_bettings != betting_index.end() &&
 		   curr_game_bettings->g_id == g_id)
 	{
 		auto lucky_betting = bettings.find(curr_game_bettings->b_id);
 
-		if (lucky_betting->lucky_number == lucky_number)
+		if (lucky_betting->lucky_number == prize_number)
 		{
 			winner = lucky_betting->player_name;
 			eosio::print("the winner:", eosio::name{winner},
@@ -252,6 +252,7 @@ void lottery::_game_rule(uint64_t g_id)
 	//当前轮游戏结束
 	games.modify(game, _self, [&](auto &g) {
 		g.winner = winner;
+		g.prize_number = prize_number;
 		g.end = true;
 	});
 

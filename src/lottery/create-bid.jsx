@@ -1,6 +1,6 @@
 import React from 'react'
 import update from 'react-addons-update';
-import {Grid, Row, Col, Panel, Label, Form, FormGroup, FormControl, ControlLabel, HelpBlock, ListGroup, ListGroupItem, Button, ProgressBar, Alert, Table, Popover, OverlayTrigger } from 'react-bootstrap';
+import { Grid, Row, Col, Panel, Label, Form, FormGroup, FormControl, ControlLabel, HelpBlock, ListGroup, ListGroupItem, Button, ProgressBar, Alert, Table, Popover, OverlayTrigger } from 'react-bootstrap';
 import { EosClient, bindNameToState } from '../scatter-client.jsx';
 import NumericInput from 'react-numeric-input';
 import Lottery from '../services/lottery.js'
@@ -44,10 +44,10 @@ export default class CreateBid extends React.Component {
       setInterval(() => {
         this.setState({ period: lotterydata.curr_game_info.g_id });
       }, 1000);
-      
+
       /* 投注人数 */
       setInterval(() => {
-        this.setState({ betperson: lotterydata.curr_game_info.current_index});
+        this.setState({ betperson: lotterydata.curr_game_info.current_index });
       }, 1000);
 
       /* 投注最大人数 */
@@ -76,8 +76,8 @@ export default class CreateBid extends React.Component {
     this.setState({ loading: true, error: false, reason: '' });
 
     let response = {};
-    
-    response = await Lottery.transfer2lottery(this.state.gamebets);
+
+    response = await Lottery.transfer2lottery(this.state.gamebets * 0.1);
     if (response.errmsg == '') {
       this.setState({ success: true });
       this.setState({ loading: false, error: false });
@@ -124,7 +124,7 @@ export default class CreateBid extends React.Component {
           <Label bsStyle="success">第{this.state.period}期</Label>
         </h3>
         <br />
-        <h5>投注进度(满{this.state.max_player}人开奖)</h5><ProgressBar active bsStyle="info" now={this.state.betperson * 100 / this.state.max_player} label={this.state.betperson+"/"+this.state.max_player} />
+        <h5>投注进度(满{this.state.max_player}人开奖)</h5><ProgressBar active bsStyle="info" now={this.state.betperson * 100 / this.state.max_player} label={this.state.betperson + "/" + this.state.max_player} />
         <Form style={{ paddingTop: '1em' }}>
           <FormGroup>
             <ControlLabel>投注账号</ControlLabel>{' '}
@@ -137,7 +137,7 @@ export default class CreateBid extends React.Component {
             />
           </FormGroup>
           <FormGroup>
-            <ControlLabel>投注数量(每注1EOS)</ControlLabel>{' '}
+            <ControlLabel>投注数量(每注0.1EOS)</ControlLabel>{' '}
             <NumericInput
               mobile
               value={this.state.gamebets}

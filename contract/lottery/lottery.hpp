@@ -96,11 +96,12 @@ class lottery : public eosio::contract
     ///@abi table lotterygame i64
     struct lotterygame : public basegame
     {
-        uint16_t current_index; //当前参与玩家序号
-        uint16_t max_player;    //本局玩家人数
-        asset prize_pool;       //奖金池
-        asset betting_value;    //每个投注金额固定
-        EOSLIB_SERIALIZE(lotterygame, (g_id)(winner)(end)(current_index)(max_player)(prize_pool)(betting_value));
+        uint16_t current_index;    //当前参与玩家序号
+        uint16_t max_player;       //本局玩家人数
+        asset prize_pool;          //奖金池
+        asset betting_value;       //每个投注金额固定
+        uint64_t prize_number = 0; //中奖号码
+        EOSLIB_SERIALIZE(lotterygame, (g_id)(winner)(end)(current_index)(max_player)(prize_pool)(betting_value)(prize_number));
     };
 
     typedef eosio::multi_index<N(lotterygame), lotterygame> game_index;
