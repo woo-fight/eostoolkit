@@ -1,7 +1,6 @@
 import React from "react";
 import { render } from "react-dom";
 import update from 'react-addons-update';
-import EosClient from '../eos-client.jsx';
 import { Button } from 'react-bootstrap';
 import { Tabs, Tab, ButtonToolbar } from 'react-bootstrap';
 // import Lottery from '../services/lottery.js'
@@ -17,19 +16,16 @@ export default class BidTable extends React.Component {
     super();
     this.state = {
       data: [],
-      list:[],
-      detail:[],
-      historyButton:'',
+      list: [],
+      detail: [],
+      historyButton: '',
       loading: false
     };
-
-
-    this.eosClient = EosClient();
   }
 
   componentDidMount() {
     setInterval(() => {
-      this.getBids();
+      this.getBettingState();
     }, 1000);
 
     setInterval(() => {
@@ -40,47 +36,47 @@ export default class BidTable extends React.Component {
   queryrecord(period, e) {
     e.preventDefault();
     let response = {};
-    response = lotterydata.getBettingsByperiod (period);
-    this.setState({ detail : response});
+    response = lotterydata.getBettingsByperiod(period);
+    this.setState({ detail: response });
   }
- 
-  refreshHistory () {
+
+  refreshHistory() {
     var btns = [];
     if (lotterydata.gamerecords !== null) {
-      for (var i = lotterydata.gamerecords.length - 1; i > 0; i--){
+      for (var i = lotterydata.gamerecords.length - 1; i > 0; i--) {
         var status = "";
-        var style ="";
+        var style = "";
         if (i == lotterydata.gamerecords.length - 1) {
           style = "success";
           status = "(进行中)";
-        }else {
+        } else {
           style = "info";
           status = "(已结束)";
         }
-        btns.push (<Button key={i} bsStyle={style}  bsSize="large" onClick={this.queryrecord.bind(this, i)}>第{i}期{status}</Button>)
+        btns.push(<Button key={i} bsStyle={style} bsSize="large" onClick={this.queryrecord.bind(this, i)}>第{i}期{status}</Button>)
       }
-   
+
       const btnlist = (
         <div className="buttons-wrap">
-        <ButtonToolbar>
-          {btns}
-        </ButtonToolbar>
-        </div>);  
+          <ButtonToolbar>
+            {btns}
+          </ButtonToolbar>
+        </div>);
 
-      this.setState({ historyButton: btnlist});
+      this.setState({ historyButton: btnlist });
     }
 
   }
-  getBids() {
+  getBettingState() {
 
     this.setState({ loading: true });
-    
+
     if (lotterydata.gamerecords !== null && JSON.stringify(lotterydata.gamerecords) != '{}') {
 
       let list_tmp = lotterydata.gamerecords;
       list_tmp[list_tmp.length - 1].winner = '正在投注';
       list_tmp[list_tmp.length - 1].prize_pool = '正在投注';
-      this.setState({list: list_tmp});
+      this.setState({ list: list_tmp });
       this.setState({ data: lotterydata.gamerecords, loading: false });
     }
   }
@@ -91,12 +87,12 @@ export default class BidTable extends React.Component {
   }
 
   render() {
-    const { list, loading, detail} = this.state;
+    const { list, loading, detail } = this.state;
     return (
       <div>
-        <Tabs bsStyle="pills"  animation={true} defaultActiveKey={1} id="uncontrolled-tab-example">
+        <Tabs bsStyle="pills" animation={true} defaultActiveKey={1} id="uncontrolled-tab-example">
           <Tab eventKey={1} title="往期开奖">
-          <br/>
+            <br />
             <ReactTable
               columns={[
                 {
@@ -130,19 +126,19 @@ export default class BidTable extends React.Component {
                   desc: true
                 }
               ]}
-              nextText = '下一页'
-              previousText = '上一页'
-              loadingText = '查询中'
-              noDataText = '无开奖记录'
-              pageText = ''
-              rowsText = '行'
+              nextText='下一页'
+              previousText='上一页'
+              loadingText='查询中'
+              noDataText='无开奖记录'
+              pageText=''
+              rowsText='行'
             />
             <br />
           </Tab>
-          <Tab eventKey={2}  title="开奖详情">
-          <br/>
+          <Tab eventKey={2} title="开奖详情">
+            <br />
             {this.state.historyButton}
-          <br/>
+            <br />
             <ReactTable
               columns={[
                 {
@@ -165,17 +161,17 @@ export default class BidTable extends React.Component {
                   )
                 }
               ]}
-              pageSizeOptions = {[50,101]}
+              pageSizeOptions={[50, 101]}
               defaultPageSize={101}
               data={detail}
               className="-striped -highlight"
               loading={loading} // Display the loading overlay when we need it
-              nextText = '下一页'
-              previousText = '上一页'
-              loadingText = '查询中'
-              noDataText = '无开奖记录'
-              pageText = ''
-              rowsText = '行'
+              nextText='下一页'
+              previousText='上一页'
+              loadingText='查询中'
+              noDataText='无开奖记录'
+              pageText=''
+              rowsText='行'
             />
             <br />
           </Tab>

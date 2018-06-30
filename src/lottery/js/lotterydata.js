@@ -8,9 +8,7 @@ class LotteryData {
 
   async load(lottery) {
     let response = { data: {}, errmsg: '' };
-    response = await lottery.getGameRecord(config.contract_account);
-    // rows.sort(function(a, b) { return b.high_bid - a.high_bid; })
-    // res.json({size: rows.length, data: rows.slice(0, 5)});
+    response = await lottery.getGameRecord(config.contract_account)
     this.gamerecords = response.data;;
     this.curr_game_info = response.data[this.gamerecords.length - 1];
     console.log(this.curr_game_info);

@@ -2,7 +2,7 @@ import Eos from 'eosjs'
 import config from 'config'
 
 class ScatterService {
-  constructor(scatter) {
+  constructor() {
     this.network = '';;
     this.scatter = undefined;
     this.eos = undefined;

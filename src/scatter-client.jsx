@@ -5,34 +5,10 @@ import { Button, Label } from 'react-bootstrap';
 import scatter from 'scatter-client';
 import config from 'config';
 
-const network = {
-    blockchain:'eos',
-    host:'mainnet.genereos.io', // ( or null if endorsed chainId )
-    port:443, // ( or null if defaulting to 80 )
-    chainId:"aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906", // Or null to fetch automatically ( takes longer )
-}
-
-const httpNetwork = {
-    blockchain:'eos',
-    host:'mainnet.genereos.io', // ( or null if endorsed chainId )
-    port:80, // ( or null if defaulting to 80 )
-    chainId:"aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906", // Or null to fetch automatically ( takes longer )
-}
-
-const eosOptions = {
-    broadcast: true,
-    sign: true,
-    chainId: "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
-}
-
-export function EosClient() {
-  return window.scatter.eos(network,Eos,eosOptions,'https');
-}
-
 export const bindNameToState = (stateSetter, paramArray) => {
-    const name = window.scatter.identity && window.scatter.identity.accounts.find(x => x.blockchain === 'eos')
-        ? window.scatter.identity.accounts.find(x => x.blockchain === 'eos').name
-        : '';
+  const name = window.scatter.identity && window.scatter.identity.accounts.find(x => x.blockchain === 'eos')
+    ? window.scatter.identity.accounts.find(x => x.blockchain === 'eos').name
+    : '';
 
   stateSetter(paramArray.reduce((acc, param) => {
     acc[param] = name;
@@ -55,7 +31,7 @@ export class ScatterConnect extends React.Component {
       // Scatter will now be available from the window scope.
       // At this stage the connection to Scatter from the application is
       // already encrypted.
-      this.setState({scatter: window.scatter, identity: window.scatter.identity});
+      this.setState({ scatter: window.scatter, identity: window.scatter.identity });
 
       // It is good practice to take this off the window once you have
       // a reference to it.
@@ -86,14 +62,14 @@ export class ScatterConnect extends React.Component {
 
   renderScatter() {
     const id = this.state.identity ? (
-          <Label bsStyle="info">{this.state.identity.name}</Label>
-        ) : ( <div/>);
+      <Label bsStyle="info">{this.state.identity.name}</Label>
+    ) : (<div />);
 
     const button = this.state.identity ? (
       <Button type="submit" onClick={this.removeIdentity.bind(this)} bsStyle="warning">解绑身份</Button>
-    )  : (
-      <Button type="submit" onClick={this.connectIdentity.bind(this)} bsStyle="info">绑定身份</Button>
-    );
+    ) : (
+        <Button type="submit" onClick={this.connectIdentity.bind(this)} bsStyle="info">绑定身份</Button>
+      );
 
     return (
       <div>
@@ -105,10 +81,10 @@ export class ScatterConnect extends React.Component {
   }
 
   render() {
-      if(this.state.scatter === undefined) {
-        return (<h3>请使用Chrome浏览器<a href="https://scatter-eos.com/" target="new">安装Scatter钱包</a>(需要梯子)</h3>);
-      } else {
-        return ( this.renderScatter() );
-      }
+    if (this.state.scatter === undefined) {
+      return (<h3>请使用Chrome浏览器<a href="https://scatter-eos.com/" target="new">安装Scatter钱包</a>(需要梯子)</h3>);
+    } else {
+      return (this.renderScatter());
     }
+  }
 }

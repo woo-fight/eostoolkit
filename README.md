@@ -1,5 +1,3 @@
-# The EOS Toolbox by GenerEOS
-
 ## BETA VERSION ##
 *Scatter Integration is coming soon!*
 
@@ -15,8 +13,3 @@ Installation is easy!
 Build it!
 * Run `npm run build`
 * Find the built package in 'dist'
-
-Connect to a different network or fullnode
-* Open 'src/eos-client'
-* Modify httpEndpoint to match the fullnode api address
-* Modify chainId to match the chainId of the network
