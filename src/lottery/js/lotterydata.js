@@ -9,7 +9,7 @@ class LotteryData {
   async load(lottery) {
     let response = { data: {}, errmsg: '' };
     response = await lottery.getGameRecord(config.contract_account)
-    this.gamerecords = response.data;;
+    this.gamerecords = response.data;
     this.curr_game_info = response.data[this.gamerecords.length - 1];
     console.log(this.curr_game_info);
     response = await lottery.getBettingsRecord(config.contract_account);

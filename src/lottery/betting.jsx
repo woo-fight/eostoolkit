@@ -39,7 +39,7 @@ export default class Betting extends React.Component {
 
       /* 投注期数 */
       setInterval(() => {
-        this.setState({ period: lotterydata.curr_game_info.g_id });
+        this.setState({ period: lotterydata.curr_game_info.g_id + 1 });
       }, 1000);
 
       /* 投注人数 */

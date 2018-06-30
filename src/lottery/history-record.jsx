@@ -36,17 +36,18 @@ export default class BidTable extends React.Component {
   queryrecord(period, e) {
     e.preventDefault();
     let response = {};
-    response = lotterydata.getBettingsByperiod(period);
+    const period_idx = period - 1;
+    response = lotterydata.getBettingsByperiod(period_idx);
     this.setState({ detail: response });
   }
 
   refreshHistory() {
     var btns = [];
     if (lotterydata.gamerecords !== null) {
-      for (var i = lotterydata.gamerecords.length - 1; i > 0; i--) {
+      for (var i = lotterydata.gamerecords.length; i > 0; i--) {
         var status = "";
         var style = "";
-        if (i == lotterydata.gamerecords.length - 1) {
+        if (i == lotterydata.gamerecords.length) {
           style = "success";
           status = "(进行中)";
         } else {
@@ -98,7 +99,10 @@ export default class BidTable extends React.Component {
                 {
                   Header: "期数",
                   id: "g_id",
-                  accessor: "g_id"
+                  accessor: "g_id",
+                  Cell: row => (
+                    <span>{(row.value + 1)}</span>
+                  )
                 },
                 {
                   Header: "获奖者",
