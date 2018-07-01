@@ -23,21 +23,21 @@ class Toolkit extends React.Component {
   render() {
     return (
       <Router>
-      <div>
-       <Navbar inverse fixedTop className="navbar">
-        <Navbar.Header>
-          <Navbar.Brand>
-            <a href="/" target="_self">EOS夺宝游戏</a>
-          </Navbar.Brand>
-        </Navbar.Header>
-      <Nav>
-        <LinkContainer to="/lottery">
-          <NavItem  onClick={ e => this.props.history.push("/lottery") } >
-            首页
+        <div>
+          <Navbar inverse fixedTop className="navbar">
+            <Navbar.Header>
+              <Navbar.Brand>
+                <a href="/" target="_self">EOS夺宝游戏</a>
+              </Navbar.Brand>
+            </Navbar.Header>
+            {/* <Nav>
+              <LinkContainer to="/lottery">
+                <NavItem onClick={e => this.props.history.push("/lottery")} >
+                  首页
           </NavItem>
-        </LinkContainer>
-      </Nav>
-      {/*
+              </LinkContainer>
+            </Nav> */}
+            {/*
       <Nav>
         <LinkContainer to="/my">
           <NavItem >
@@ -46,20 +46,20 @@ class Toolkit extends React.Component {
         </LinkContainer>
       </Nav>
       */}
-      </Navbar>
+          </Navbar>
 
-      <div className="container theme-showcase" role="main">
-        <Panel bsStyle="primary">
-          <Panel.Heading>
-            <Panel.Title componentClass="h3">Scatter钱包插件</Panel.Title>
-          </Panel.Heading>
-          <Panel.Body><ScatterConnect/></Panel.Body>
-        </Panel>
-            <Route exact path="/" component={Home} />
-            <Route path="/lottery" component={Lottery} />
-        <p style={{float: 'right'}}>EOS121DAC 2018 </p>
-      </div>
-      </div>
+          <div className="container theme-showcase" role="main">
+            <Panel bsStyle="primary">
+              <Panel.Heading>
+                <Panel.Title componentClass="h3">Scatter钱包插件</Panel.Title>
+              </Panel.Heading>
+              <Panel.Body><ScatterConnect /></Panel.Body>
+            </Panel>
+            <Route exact path="/" component={Lottery} />
+            {/* <Route path="/lottery" component={Lottery} /> */}
+            <p style={{ float: 'right' }}>EOS121DAC 2018 </p>
+          </div>
+        </div>
       </Router>
     );
   }

@@ -16,9 +16,9 @@ export default class BidTable extends React.Component {
     super();
     this.state = {
       data: [],
-      list:[],
-      detail:[],
-      historyButton:'',
+      list: [],
+      detail: [],
+      historyButton: '',
       timer: '',
       loading: false
     };
@@ -34,15 +34,15 @@ export default class BidTable extends React.Component {
     }, 1000);
 
     /* 默认显示最新一期的开奖详情 */
-    this.state.timer=setInterval(()=>{
-    if (lotterydata.gamerecords !== null) {
-      let response = {};
-      response = lotterydata.getBettingsByperiod (lotterydata.gamerecords.length - 1);
-      this.setState({ detail : response});
-      clearInterval(this.state.timer);
-    }
-  },1000);
-}
+    this.state.timer = setInterval(() => {
+      if (lotterydata.gamerecords !== null) {
+        let response = {};
+        response = lotterydata.getBettingsByperiod(lotterydata.gamerecords.length - 1);
+        this.setState({ detail: response });
+        clearInterval(this.state.timer);
+      }
+    }, 1000);
+  }
 
   queryrecord(period, e) {
     e.preventDefault();
@@ -54,7 +54,7 @@ export default class BidTable extends React.Component {
 
   refreshHistory() {
     var btns = [];
-    if (lotterydata.gamerecords !== null) {
+    if (lotterydata.gamerecords !== null && lotterydata.gamerecords.length !== 0) {
       for (var i = lotterydata.gamerecords.length; i > 0; i--) {
         var status = "";
         var style = "";
@@ -83,7 +83,7 @@ export default class BidTable extends React.Component {
 
     this.setState({ loading: true });
 
-    if (lotterydata.gamerecords !== null && JSON.stringify(lotterydata.gamerecords) != '{}') {
+    if (lotterydata.gamerecords !== null && lotterydata.gamerecords.length !== 0 && JSON.stringify(lotterydata.gamerecords) != '{}') {
 
       let list_tmp = lotterydata.gamerecords;
       list_tmp[list_tmp.length - 1].winner = '正在投注';

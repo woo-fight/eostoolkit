@@ -237,7 +237,7 @@ void lottery::_game_rule(uint64_t g_id)
 			//发奖励
 			action(permission_level{_self, N(active)}, N(eosio.token), N(transfer),
 				   std::make_tuple(_self, winner, game->prize_pool,
-								   std::string("winner")))
+								   std::string("恭喜您中奖啦！")))
 				.send();
 			break;
 		}

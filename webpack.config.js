@@ -7,14 +7,32 @@ module.exports = {
   module: {
     rules: [
       { test: /\.(js|jsx)$/, exclude: /node_modules/, use: ['babel-loader'] },
-      { test:/\.css$/, use:['style-loader','css-loader']}
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        use: [
+          'file-loader',
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              progressive: true,
+              optimizationLevel: 7,
+              interlaced: false,
+              pngquant: {
+                quality: '65-90',
+                speed: 4,
+              },
+            },
+          },
+        ],
+      },
     ],
   },
-  resolve: { 
-    extensions: ['*', '.js', '.jsx'], 
+  resolve: {
+    extensions: ['*', '.js', '.jsx'],
     alias: {
       'scatter-client':
-          path.resolve(__dirname, 'src/services/scatter-client.js'),
+        path.resolve(__dirname, 'src/services/scatter-client.js'),
       'lottery': path.resolve(__dirname, 'src/services/lottery.js'),
       'config': path.resolve(__dirname, 'src/services/config.js'),
     }
@@ -23,7 +41,7 @@ module.exports = {
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new CleanWebpackPlugin(['dist']),
-    new HtmlWebpackPlugin({hash: true, template: 'src/index.html'})
+    new HtmlWebpackPlugin({ hash: true, template: 'src/index.html' })
   ],
   devServer: { contentBase: './dist', hot: true }
 };

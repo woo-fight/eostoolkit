@@ -5,7 +5,7 @@ import { bindNameToState } from '../scatter-client.jsx';
 import NumericInput from 'react-numeric-input';
 import Lottery from '../services/lottery.js'
 import lotterydata from './js/lotterydata.js'
-
+import pay from '../images/pay.jpeg'
 export default class Betting extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -39,16 +39,19 @@ export default class Betting extends React.Component {
 
       /* 投注期数 */
       setInterval(() => {
-        this.setState({ period: lotterydata.curr_game_info.g_id + 1 });
+        if (lotterydata.curr_game_info)
+          this.setState({ period: lotterydata.curr_game_info.g_id + 1 });
       }, 1000);
 
       /* 投注人数 */
       setInterval(() => {
-        this.setState({ betperson: lotterydata.curr_game_info.current_index });
+        if (lotterydata.curr_game_info)
+          this.setState({ betperson: lotterydata.curr_game_info.current_index });
       }, 1000);
 
       /* 投注最大人数 */
-      this.setState({ max_player: lotterydata.curr_game_info.max_player });
+      if (lotterydata.curr_game_info)
+        this.setState({ max_player: lotterydata.curr_game_info.max_player });
     });
   }
 
@@ -144,6 +147,7 @@ export default class Betting extends React.Component {
           </FormGroup>{' '}
           <Button type="submit" onClick={this.createlottery.bind(this)}>投注</Button>
         </Form>
+        <img style={{ paddingTop: '2em' }} width="270" height="382" src={pay} alt="" />
         <div style={{ paddingTop: '2em' }}>
           <RenderStatus />
         </div>

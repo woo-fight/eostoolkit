@@ -7,15 +7,28 @@ class LotteryData {
   }
 
   async load(lottery) {
-    let response = { data: {}, errmsg: '' };
-    response = await lottery.getGameRecord(config.contract_account)
-    this.gamerecords = response.data;
-    this.curr_game_info = response.data[this.gamerecords.length - 1];
-    console.log(this.curr_game_info);
+    let response = { data: {}, errmsg: null };
+    response = await lottery.getGameRecord(config.contract_account);
+    if (response.errmsg !== '') {
+      this.gamerecords = [];
+      this.bettingsrecords = [];
+      console.log('getGameRecord failed, check your neteork and config')
+    } else {
+      this.gamerecords = response.data;
+      this.curr_game_info = response.data[this.gamerecords.length - 1];
+      console.log(this.curr_game_info);
+    }
+    response.errmsg = '';
     response = await lottery.getBettingsRecord(config.contract_account);
-    this.bettingsrecords = response.data;
+    if (response.errmsg !== '') {
+      this.bettingsrecords = [];
+      console.log('getBettingsRecord failed, check your neteork and config')
 
-    console.log(`betperson:${this.curr_game_info.current_index},period:${this.curr_game_info.g_id}`)
+    } else {
+      this.bettingsrecords = response.data;
+    }
+
+    // console.log(`betperson:${this.curr_game_info.current_index},period:${this.curr_game_info.g_id}`)
   }
 
   getBettingsByperiod(period) {
