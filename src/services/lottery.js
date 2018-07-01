@@ -24,8 +24,8 @@ class Lottery {
   }
   async getGameRecord(account) {
     const response = { data: {}, errmsg: '' };
-    const localNet = ScatterService.getEos();
-    const games_info = await localNet.getTableRows({
+    const locaQrylNet = ScatterService.locaQrylNet;
+    const games_info = await locaQrylNet.getTableRows({
       "json": true,
       "scope": account,
       "code": config.contract_account,
@@ -52,8 +52,8 @@ class Lottery {
   }
   async getBettingsRecord(account) {
     const response = { data: {}, errmsg: '' };
-    const localNet = ScatterService.getEos();
-    const bettings_info = await localNet.getTableRows({
+    const locaQrylNet = ScatterService.locaQrylNet;
+    const bettings_info = await locaQrylNet.getTableRows({
       "json": true,
       "scope": account,
       "code": config.contract_account,

@@ -6,11 +6,15 @@ class ScatterService {
     this.network = '';;
     this.scatter = undefined;
     this.eos = undefined;
+    this.locaQrylNet = undefined;
     document.addEventListener('scatterLoaded', scatterExtension => {
       console.log('ScatterService init');
       window.scatter.suggestNetwork(config.customNetwork);
       this.load(window.scatter, config.customNetwork);
     })
+
+    this.locaQrylNet = Eos(config.eosConfig);
+
   }
 
   async load(scatter, network) {
@@ -24,7 +28,7 @@ class ScatterService {
       broadcast: true,
       sign: true,
       chainId: this.network.chainId
-    }, config.customNetwork.protocol);
+    }, config.testnet ? 'http' : 'https');
   }
   login(network) {
     console.log('login:', this.scatter, '   network', network);
