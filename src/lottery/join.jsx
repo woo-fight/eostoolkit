@@ -1,7 +1,7 @@
 import React from 'react'
 import { Panel } from 'react-bootstrap';
-import BidTable from './bid-table.jsx'
-import CreateBid from './create-bid.jsx'
+import HistoryRecord from './history-record'
+import Betting from './betting'
 
 export default class Names extends React.Component {
   constructor(props, context) {
@@ -15,13 +15,13 @@ export default class Names extends React.Component {
           <Panel.Heading>
             <Panel.Title componentClass="h3">投注</Panel.Title>
           </Panel.Heading>
-          <Panel.Body><CreateBid/></Panel.Body>
+          <Panel.Body><Betting /></Panel.Body>
         </Panel>
         <Panel bsStyle="primary">
           <Panel.Heading>
             <Panel.Title componentClass="h3">开奖历史</Panel.Title>
           </Panel.Heading>
-          <Panel.Body><BidTable/></Panel.Body>
+          <Panel.Body><HistoryRecord /></Panel.Body>
         </Panel>
       </div>
     );

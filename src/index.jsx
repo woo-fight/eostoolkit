@@ -5,14 +5,8 @@ import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { Navbar, Nav, NavItem, Panel, Alert, ButtonGroup, Button } from 'react-bootstrap';
 import { ScatterConnect } from './scatter-client.jsx';
 import { LinkContainer } from 'react-router-bootstrap';
-/*
-import Unlock from './unlock.jsx'
-import Tools from './tools/tools.jsx'
-import Names from './names/names.jsx'
-import Staking from './staking/staking.jsx'
-*/
+
 import Lottery from './lottery/join.jsx'
-import My from './my/my.jsx'
 import './theme.css';
 
 const Home = () => (
@@ -63,7 +57,6 @@ class Toolkit extends React.Component {
         </Panel>
             <Route exact path="/" component={Home} />
             <Route path="/lottery" component={Lottery} />
-            <Route path="/my" component={My} />
         <p style={{float: 'right'}}>EOS121DAC 2018 </p>
       </div>
       </div>

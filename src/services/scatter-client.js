@@ -2,7 +2,7 @@ import Eos from 'eosjs'
 import config from 'config'
 
 class ScatterService {
-  constructor(scatter) {
+  constructor() {
     this.network = '';;
     this.scatter = undefined;
     this.eos = undefined;
@@ -24,7 +24,7 @@ class ScatterService {
       broadcast: true,
       sign: true,
       chainId: this.network.chainId
-    }, config.environment.eosProtocol);
+    }, config.customNetwork.protocol);
   }
   login(network) {
     console.log('login:', this.scatter, '   network', network);

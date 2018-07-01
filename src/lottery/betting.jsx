@@ -1,15 +1,12 @@
 import React from 'react'
 import update from 'react-addons-update';
 import { Grid, Row, Col, Panel, Label, Form, FormGroup, FormControl, ControlLabel, HelpBlock, ListGroup, ListGroupItem, Button, ProgressBar, Alert, Table, Popover, OverlayTrigger } from 'react-bootstrap';
-import { EosClient, bindNameToState } from '../scatter-client.jsx';
+import { bindNameToState } from '../scatter-client.jsx';
 import NumericInput from 'react-numeric-input';
 import Lottery from '../services/lottery.js'
 import lotterydata from './js/lotterydata.js'
 
-import config from 'config'
-import ScatterService from '../services/scatter-client.js'
-
-export default class CreateBid extends React.Component {
+export default class Betting extends React.Component {
   constructor(props, context) {
     super(props, context);
 
@@ -42,7 +39,7 @@ export default class CreateBid extends React.Component {
 
       /* 投注期数 */
       setInterval(() => {
-        this.setState({ period: lotterydata.curr_game_info.g_id });
+        this.setState({ period: lotterydata.curr_game_info.g_id + 1 });
       }, 1000);
 
       /* 投注人数 */
@@ -58,7 +55,6 @@ export default class CreateBid extends React.Component {
   async  componentDidMount() {
     // this.load(window.scatter, config.customNetwork);
     if (window.scatter !== undefined) {
-      this.setState({ eos: EosClient() });
       bindNameToState(this.setState.bind(this), ['bidder']);
     }
   }

@@ -30,7 +30,7 @@ class Lottery {
       "scope": account,
       "code": config.contract_account,
       "table": 'lotterygame',
-      "limit": 10000
+      "limit": 1000000
     }).then(res => {
       if (res && res.rows && res.rows.length) {
         return res.rows;
@@ -58,7 +58,7 @@ class Lottery {
       "scope": account,
       "code": config.contract_account,
       "table": 'betting',
-      "limit": 10000
+      "limit": 1000000
     }).then(res => {
       if (res && res.rows && res.rows.length) {
         return res.rows;
