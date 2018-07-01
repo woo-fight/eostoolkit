@@ -20,9 +20,9 @@ export default class BidTable extends React.Component {
       list:[],
       detail:[],
       historyButton:'',
+      timer: '',
       loading: false
     };
-
 
     this.eosClient = EosClient();
   }
@@ -35,7 +35,17 @@ export default class BidTable extends React.Component {
     setInterval(() => {
       this.refreshHistory();
     }, 1000);
-  }
+
+    /* 默认显示最新一期的开奖详情 */
+    this.state.timer=setInterval(()=>{
+    if (lotterydata.gamerecords !== null) {
+      let response = {};
+      response = lotterydata.getBettingsByperiod (lotterydata.gamerecords.length - 1);
+      this.setState({ detail : response});
+      clearInterval(this.state.timer);
+    }
+  },1000);
+}
 
   queryrecord(period, e) {
     e.preventDefault();
