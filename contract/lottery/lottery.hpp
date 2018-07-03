@@ -16,7 +16,7 @@ using std::string;
 /* ****************************************** */
 /* ------------ Types Declarations ---------- */
 /* ****************************************** */
-
+constexpr uint32_t MAX_PERIOD = 20;
 /* ****************************************** */
 /* ------------ Contract Definition --------- */
 /* ****************************************** */
@@ -145,5 +145,6 @@ class lottery : public eosio::contract
     void _creategame(const asset &prize_pool, const asset &betting_value, uint16_t max_player);
     void _game_rule(uint64_t g_id);
     void _join(const account_name &name, const lotterygame &game);
+    void _distorygame(uint64_t g_id);
     st_config _get_config();
 };

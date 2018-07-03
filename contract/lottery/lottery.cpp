@@ -256,6 +256,12 @@ void lottery::_game_rule(uint64_t g_id)
 		g.end = true;
 	});
 
+	/* 如果当前期数比最小期数小于 MAX_PERIOD，则删除最小期数的数据 */
+	if ((g_id - games.begin()->g_id) >= MAX_PERIOD)
+	{
+		_distorygame(games.begin()->g_id);
+	}
+
 	// 开始新一轮的游戏
 	_creategame(game->prize_pool, game->betting_value, game->max_player);
 	// creategame(eosio::chain::asset::from_string("100.0000" " "
@@ -303,6 +309,22 @@ void lottery::_join(const account_name &name, const lotterygame &game)
 	{
 		eosio::print("palyer num not enough\n");
 	}
+}
+void lottery::_distorygame(uint64_t g_id)
+{
+	auto itr = games.find(g_id);
+	eosio_assert(itr != games.end(), "the game dose not exist");
+
+	auto betting_index = bettings.get_index<N(bygid)>();
+	auto game_bettings = betting_index.find(g_id);
+	/* 删除当前投票数据 */
+	while (game_bettings != betting_index.end() &&
+		   game_bettings->g_id == g_id)
+	{
+		betting_index.erase(game_bettings++);
+	}
+	/* 删除当前游戏数据 */
+	games.erase(itr);
 }
 
 lottery::st_config lottery::_get_config()
